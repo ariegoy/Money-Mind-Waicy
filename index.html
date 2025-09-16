@@ -22,8 +22,11 @@
   button.ghost{background:#fff;color:var(--accent);border-color:var(--accent)}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
   .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted);background:#fff}
-  .progress{height:10px;background:#eef2f7;border-radius:12px;overflow:hidden}
+  .progress{height:12px;background:#eef2f7;border-radius:12px;overflow:hidden;position:relative}
   .bar{height:100%;background:var(--ok)}
+  .goalwrap{position:relative}
+  .ms{position:absolute;top:0;bottom:0;width:2px;background:rgba(15,23,42,.12)}
+  .ms::after{content:attr(data-p);position:absolute;top:-20px;transform:translateX(-50%);font-size:10px;color:var(--muted)}
   ul{list-style:none;margin:0;padding:0}
   li{padding:8px 0;border-bottom:1px solid var(--line)}
   small{color:var(--muted)} code{color:#155e75}
@@ -31,7 +34,14 @@
   textarea{width:100%;min-height:90px;resize:vertical}
   .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin-right:6px;margin-top:4px}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:900px){.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+  .badge{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:#fff}
+  .badge i{font-style:normal;font-size:18px}
+  .badge.locked{opacity:.35}
+  .badgegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  /* confetti */
+  .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.8}}
+  @media (max-width:900px){.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.badgegrid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -97,7 +107,13 @@
         <input id="goalAlloc" type="number" min="0" max="100" step="1" placeholder="% alloc (e.g., 40)">
         <button id="gAdd" class="ghost">Add/Update</button>
       </div>
-      <div class="progress" style="margin-top:10px"><div class="bar" id="bar" style="width:0%"></div></div>
+      <div class="goalwrap" style="margin-top:10px">
+        <div class="progress"><div class="bar" id="bar" style="width:0%"></div></div>
+        <div class="ms" style="left:25%" data-p="25%"></div>
+        <div class="ms" style="left:50%" data-p="50%"></div>
+        <div class="ms" style="left:75%" data-p="75%"></div>
+        <div class="ms" style="left:100%" data-p="100%"></div>
+      </div>
       <div class="between" style="margin-top:6px"><small>Goal</small><small id="goalText">—</small></div>
       <div id="goalsList" style="margin-top:8px"></div>
     </section>
@@ -160,6 +176,14 @@
       <div id="coachText" class="pill" style="margin-top:8px"></div>
     </section>
 
+    <!-- Streak & Badges -->
+    <section class="card">
+      <h3 class="section-title">Streak & Badges</h3>
+      <div class="between"><div><strong>Current Streak</strong></div><div><strong id="streakCount">0</strong> day(s)</div></div>
+      <div class="sub" id="lastSaveText" style="margin-top:4px">Last save: —</div>
+      <div id="badges" class="badgegrid" style="margin-top:8px"></div>
+    </section>
+
     <!-- Competitions -->
     <section class="card">
       <h3 class="section-title">Competitions</h3>
@@ -177,7 +201,7 @@
         <button id="groupShare">Share</button>
         <select id="boardMode" style="margin-left:auto"><option value="friends">Friends</option><option value="region">Region</option><option value="world">World</option></select>
       </div>
-      <small id="boardTip" class="tip">Create or join a group to see your friends leaderboard.</small>
+      <small id="boardTip" class="pill">Create or join a group to see your friends leaderboard.</small>
       <ul id="board" style="margin-top:8px"></ul>
     </section>
   </main>
@@ -186,7 +210,7 @@
 // ---------- Helpers & State ----------
 const $ = (id) => document.getElementById(id);
 const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals' };
+const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals', SHARED:'mm_shared', MILE:'mm_goal_milestone' };
 const state = {
   cur: localStorage.getItem(K.CUR) || 'USD',
   goal: +(localStorage.getItem(K.GOAL) || 200),
@@ -197,7 +221,10 @@ const state = {
   lastSave: localStorage.getItem(K.LAST) || null,
   profile: JSON.parse(localStorage.getItem(K.PROFILE) || '{"name":"","region":"NA"}'),
   group: localStorage.getItem(K.GROUP) || (new URLSearchParams(location.search).get('group') || ''),
-  goals: JSON.parse(localStorage.getItem(K.GOALS) || '[]') // [{name,target,alloc}]
+  goals: JSON.parse(localStorage.getItem(K.GOALS) || '[]'), // [{name,target,alloc}]
+  badges: JSON.parse(localStorage.getItem(K.BADGES) || '[]'), // [{id,label,icon,ts}]
+  sharedOnce: localStorage.getItem(K.SHARED) === '1',
+  milestone: +(localStorage.getItem(K.MILE) || 0) // highest % milestone hit (0,25,50,75,100)
 };
 
 function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
@@ -213,10 +240,10 @@ function saveInstead(amt){
   amt = Number(amt);
   if(!amt || amt<=0) return;
   const rec = { ts: nowISO(), amt, cat: $("category").value, note: $("note").value.trim() };
-  state.hist.push(rec);
-  setk(K.HIST, state.hist);
+  state.hist.push(rec); setk(K.HIST, state.hist);
   updateStreakOnSave();
   suggest(rec);
+  awardBadges();
   render();
 }
 function upsertGoal(){
@@ -225,6 +252,7 @@ function upsertGoal(){
   const i = state.goals.findIndex(g=>g.name.toLowerCase()===name.toLowerCase());
   if(i>=0) state.goals[i] = {name,target,alloc}; else state.goals.push({name,target,alloc});
   setk(K.GOALS,state.goals); state.goal = target; setk(K.GOAL,target);
+  awardBadges();
   render();
 }
 function exportCSV(){
@@ -250,6 +278,72 @@ function updateStreakOnSave(){
   state.lastSave = new Date().toISOString(); setk(K.STREAK,state.streak); setk(K.LAST,state.lastSave);
 }
 function isYesterday(lastYmd){ const y2=new Date(); y2.setDate(y2.getDate()-1); return lastYmd===ymd(y2); }
+
+// ---------- Badges ----------
+function haveBadge(id){ return state.badges.some(b=>b.id===id); }
+function giveBadge(id,label,icon){ if(haveBadge(id)) return; state.badges.push({id,label,icon,ts:nowISO()}); setk(K.BADGES,state.badges); }
+function awardBadges(){
+  const saved = totalSaved();
+  const month = monthSaved();
+  const cats = new Set(state.hist.map(h=>h.cat||'Other'));
+  if(state.hist.length>=1) giveBadge('first','First Save','🎉');
+  if(saved>=100) giveBadge('100','Saved $100','🏅');
+  if(saved>=500) giveBadge('500','Saved $500','💰');
+  if(saved>=1000) giveBadge('1000','Saved $1000','💎');
+  if(state.streak>=3) giveBadge('streak3','3‑Day Streak','🔥');
+  if(state.streak>=7) giveBadge('streak7','7‑Day Streak','🌟');
+  if(month>=100) giveBadge('month100','$100 This Month','📅');
+  if(cats.size>=5) giveBadge('diverse','Category Explorer (5+)','🧭');
+  if(state.sharedOnce) giveBadge('share','Shared Challenge','🔗');
+  renderBadges();
+}
+function renderBadges(){
+  const slot = $("badges"); slot.innerHTML='';
+  const all = [
+    {id:'first', label:'First Save', icon:'🎉'},
+    {id:'100', label:'Saved $100', icon:'🏅'},
+    {id:'500', label:'Saved $500', icon:'💰'},
+    {id:'1000', label:'Saved $1000', icon:'💎'},
+    {id:'streak3', label:'3‑Day Streak', icon:'🔥'},
+    {id:'streak7', label:'7‑Day Streak', icon:'🌟'},
+    {id:'month100', label:'$100 This Month', icon:'📅'},
+    {id:'diverse', label:'Category Explorer (5+)', icon:'🧭'},
+    {id:'share', label:'Shared Challenge', icon:'🔗'}
+  ];
+  all.forEach(b=>{
+    const earned = haveBadge(b.id);
+    const div = document.createElement('div');
+    div.className = 'badge' + (earned?'':' locked');
+    div.innerHTML = `<i>${b.icon}</i><span>${b.label}</span>`;
+    slot.appendChild(div);
+  });
+}
+
+// ---------- Confetti ----------
+function confetti(count=120, duration=1600){
+  const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');
+    el.className='confetti';
+    el.style.left = Math.random()*100+'vw';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+    el.style.animationDelay = (Math.random()*0.3)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), duration+700);
+  }
+}
+
+function checkMilestones(pct){
+  const marks=[25,50,75,100];
+  for(const m of marks){
+    if(pct>=m && state.milestone < m){
+      state.milestone = m; setk(K.MILE,String(m));
+      confetti();
+      break;
+    }
+  }
+}
 
 // ---------- Debt (simple text view) ----------
 function drawDebt(){
@@ -282,7 +376,7 @@ function renderMetrics(){
 function computeScore(){ return Math.round(totalSaved() + state.streak*5); }
 function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)] + ' ' + String.fromCharCode(65+Math.floor(rnd()*26)) + '.'); } return out; }
 function samplePeers(mode){ let seedStr = mode==='friends' && state.group ? 'G:'+state.group : mode+':'+(state.profile.region||'NA'); const rnd=prng(hash(seedStr)); const names=sampleNames(hash(seedStr)+12345); return names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); }
-function renderBoard(){ const mode=$("boardMode").value; const ul=$("board"); ul.innerHTML=''; const mine={name:state.profile.name||'You',score:computeScore(),me:true}; const peers=samplePeers(mode); const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,10); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); }); const tip=$("boardTip"); if(mode==='friends'&&!state.group){ tip.textContent='Create or join a group to compete with friends.';} else if(mode==='friends'&&state.group){ tip.textContent='Group: '+state.group+' — share this with friends.';} else if(mode==='region'){ tip.textContent='Showing top savers in your region.';} else { tip.textContent='Global leaderboard preview.'; } }
+function renderBoard(){ const mode=$("boardMode").value; const ul=$("board"); ul.innerHTML=''; const mine={name:state.profile.name||'You',score:computeScore(),me:true}; const peers=samplePeers(mode); const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,10); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); }); const tip=$("boardTip"); if(mode==='friends'&&!state.group){ tip.textContent='Create or join a group to compete with friends.';} else if(mode==='friends'&&state.group){ tip.textContent='Group: '+state.group+' — share this with friends.';} else if(mode==='region'){ tip.textContent='Showing top savers in your region.';} else { tip.textContent='Global leaderboard preview.'; } }
 
 // ---------- Render ----------
 function render(){
@@ -290,12 +384,13 @@ function render(){
   // progress for primary goal
   const saved = totalSaved(); $("goalText").textContent = state.goal?fmt(state.goal):'—';
   const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0; $("bar").style.width = pct+"%";
+  checkMilestones(pct);
 
   // history
   const filt = $("hFilter").value; const now=Date.now(); let items=[...state.hist];
   if(filt==='week'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 7*24*3600*1000 ); }
   if(filt==='month'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 30*24*3600*1000 ); }
-  const ul=$("history"); ul.innerHTML=''; items.slice().reverse().forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class="between"><div>${new Date(h.ts).toLocaleString()}</div><div><strong>${fmt(h.amt)}</strong> <small>${h.cat||''}</small></div></div>${h.note?`<small>${h.note}</small>`:''}`; ul.appendChild(li); });
+  const ul=$("history"); ul.innerHTML=''; items.slice().reverse().forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${new Date(h.ts).toLocaleString()}</div><div><strong>${fmt(h.amt)}</strong> <small>${h.cat||''}</small></div></div>${h.note?`<small>${h.note}</small>`:''}`; ul.appendChild(li); });
 
   // goals list
   const gl=$("goalsList"); gl.innerHTML=''; state.goals.forEach(g=>{ const span=document.createElement('span'); span.className='pill'; span.textContent=`${g.name}: ${fmt(g.target)} • ${g.alloc||0}%`; gl.appendChild(span); });
@@ -305,7 +400,7 @@ function render(){
   const lines=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]).map(k=>`${k} — ${fmt(byCat[k])}`); $("whereSaved").value = lines.join("\n");
 
   // other panels
-  drawDebt(); drawFV(); renderMetrics(); renderBoard();
+  drawDebt(); drawFV(); renderMetrics(); renderBoard(); renderBadges();
 }
 
 // ---------- Listeners ----------
@@ -335,8 +430,8 @@ document.addEventListener('DOMContentLoaded', function(){
   // Coach (local demo)
   $("ask").addEventListener('click', function(){ const q=$("question").value.trim(); $("ask").disabled=true; $("ask").textContent='…'; setTimeout(()=>{ const tip=q?`Rule of 30 uses: will you use it 30 times?`: 'Try the 24‑hour rule before big buys.'; $("coachText").textContent=tip; $("ask").disabled=false; $("ask").textContent='Ask Coach'; }, 500); });
 
-  // Share
-  $("share").addEventListener('click', function(){ const url=location.origin+location.pathname+(state.group?('?group='+encodeURIComponent(state.group)):''); try{ if(navigator.share){ navigator.share({title:'Money Mind',text:'Join my saving challenge!',url}); } else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Copy Link',1200); }); } }catch(_){} });
+  // Share (track for badge)
+  $("share").addEventListener('click', function(){ const url=location.origin+location.pathname+(state.group?('?group='+encodeURIComponent(state.group)):''); try{ if(navigator.share){ navigator.share({title:'Money Mind',text:'Join my saving challenge!',url}); } else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Copy Link',1200); }); } }catch(_){} finally{ state.sharedOnce=true; setk(K.SHARED,'1'); awardBadges(); } });
 
   // Competition inputs
   $("nameIn").addEventListener('input', e=>{ state.profile.name=e.target.value; setk(K.PROFILE,state.profile); renderBoard(); });
