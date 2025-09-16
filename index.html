@@ -23,6 +23,8 @@
   ul{list-style:none;margin:0;padding:0}
   li{padding:8px 0;border-bottom:1px solid var(--line)}
   small{color:var(--muted)} code{color:#a7f3d0}
+  .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:4px 6px 0 0}
+  .badge i{font-style:normal}
   @media (max-width:900px){main{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -114,6 +116,13 @@
 
       <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
 
+      <h3 style="margin-top:0">Streak & Badges</h3>
+      <div class="between"><div><strong>Current Streak</strong></div><div><strong id="streakCount">0</strong> day(s)</div></div>
+      <div class="sub" id="lastSaveText" style="margin-top:4px">Last save: —</div>
+      <div id="badges" style="margin-top:8px"></div>
+
+      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
+
       <div class="between">
         <button id="share">Share</button>
         <button id="ask">Ask Coach</button>
@@ -126,18 +135,22 @@
 // ---------- Helpers & State ----------
 const $ = (id) => document.getElementById(id);
 const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat' };
+const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges' };
 const state = {
   cur: localStorage.getItem(K.CUR) || 'USD',
   goal: +(localStorage.getItem(K.GOAL) || 200),
   hist: JSON.parse(localStorage.getItem(K.HIST) || '[]'),
   debts: JSON.parse(localStorage.getItem(K.DEBTS) || '[]'),
-  debtStrat: localStorage.getItem(K.STRAT) || 'snowball'
+  debtStrat: localStorage.getItem(K.STRAT) || 'snowball',
+  streak: +(localStorage.getItem(K.STREAK) || 0),
+  lastSave: localStorage.getItem(K.LAST) || null,
+  badges: JSON.parse(localStorage.getItem(K.BADGES) || '[]') // [{id,label,icon,ts}]
 };
 
 function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
 function fmt(n){ return C[state.cur] + (Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})); }
 function nowISO(){ return new Date().toISOString(); }
+function ymd(d){ const x = new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
 
 // ---------- Core Actions ----------
 function saveInstead(amt){
@@ -145,6 +158,8 @@ function saveInstead(amt){
   if(!amt || amt<=0) return;
   state.hist.push({ ts: nowISO(), amt });
   setk(K.HIST, state.hist);
+  updateStreakOnSave();
+  awardBadges();
   render();
 }
 
@@ -165,6 +180,40 @@ function exportCSV(){
 }
 
 function renderHistory(){ render(); }
+
+// ---------- Streak & Badges Logic ----------
+function updateStreakOnSave(){
+  const today = ymd(new Date());
+  const last = state.lastSave ? ymd(state.lastSave) : null;
+  if(last === today){
+    // same day, keep streak
+  } else if(last && isYesterday(last, today)){
+    state.streak = (state.streak||0) + 1;
+  } else {
+    state.streak = 1; // new streak
+  }
+  state.lastSave = new Date().toISOString();
+  setk(K.STREAK, state.streak);
+  setk(K.LAST, state.lastSave);
+}
+function isYesterday(lastYmd, todayYmd){
+  const [y,m,d] = lastYmd.split('-').map(Number);
+  const last = new Date(y, m-1, d);
+  const y2 = new Date(); y2.setDate(y2.getDate()-1);
+  return ymd(last) === ymd(y2);
+}
+
+function awardBadges(){
+  const saved = totalSaved();
+  const have = new Set(state.badges.map(b=>b.id));
+  const add = (id,label,icon)=>{ if(!have.has(id)){ state.badges.push({id,label,icon,ts:nowISO()}); setk(K.BADGES,state.badges);} };
+
+  if(saved >= 0 && !have.has('first') && state.hist.length>0) add('first','First Save','🎉');
+  if(saved >= 100) add('100','Saved $100','🏅');
+  if(saved >= 500) add('500','Saved $500','💰');
+  if(state.streak >= 3) add('streak3','3‑Day Streak','🔥');
+  if(state.streak >= 7) add('streak7','7‑Day Streak','🌟');
+}
 
 // ---------- Debt ----------
 function drawDebt(){
@@ -220,6 +269,17 @@ function render(){
   // debts & fv
   drawDebt();
   drawFV();
+
+  // streak & badges
+  $("streakCount").textContent = state.streak || 0;
+  $("lastSaveText").textContent = state.lastSave ? `Last save: ${new Date(state.lastSave).toLocaleDateString()}` : 'Last save: —';
+  const bb = $("badges"); bb.innerHTML='';
+  state.badges.forEach(b=>{
+    const div = document.createElement('span');
+    div.className='badge';
+    div.innerHTML = `<i>${b.icon}</i><span>${b.label}</span>`;
+    bb.appendChild(div);
+  });
 }
 
 // ---------- Listeners (no dead buttons) ----------
