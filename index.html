@@ -5,37 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Money Mind — Save Instead</title>
 <style>
-  :root{--bg:#0b1220;--fg:#e6eefb;--muted:#9fb4d9;--accent:#4f9cff;--ok:#22c55e;--warn:#ef4444;--card:#141c2e;--line:#22304d}
+  :root{--bg:#f4f6f8;--fg:#0f172a;--muted:#6b7280;--accent:#2563eb;--ok:#16a34a;--warn:#ef4444;--card:#ffffff;--line:#e5e7eb}
   *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
-  header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;justify-content:space-between}
-  h1{margin:0;font-size:20px;font-weight:800} .sub{color:var(--muted);font-size:12px}
-  main{padding:16px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
-  .row{display:flex;gap:8px;align-items:center}
+  header{padding:18px 20px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:22px;font-weight:800}
+  main{padding:16px;display:grid;grid-template-columns:1fr;gap:16px;max-width:1100px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .row{display:flex;gap:10px;align-items:center}
   .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  input,select,button{border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);padding:10px}
-  button{cursor:pointer} button.primary{border-color:var(--accent);color:var(--accent)}
-  button.success{border-color:var(--ok);color:var(--ok)} button.warn{border-color:var(--warn);color:var(--warn)}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted)}
-  .progress{height:10px;background:#0f172a;border-radius:12px;overflow:hidden}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .metric{background:#fbfbfd;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .metric b{display:block;font-size:14px;color:var(--muted)}
+  .metric strong{font-size:18px}
+  input,select,button,textarea{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);padding:10px}
+  button{cursor:pointer} button.primary{background:#22c55e;color:#fff;border-color:#22c55e}
+  button.ghost{background:#fff;color:var(--accent);border-color:var(--accent)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted);background:#fff}
+  .progress{height:10px;background:#eef2f7;border-radius:12px;overflow:hidden}
   .bar{height:100%;background:var(--ok)}
   ul{list-style:none;margin:0;padding:0}
   li{padding:8px 0;border-bottom:1px solid var(--line)}
-  small{color:var(--muted)} code{color:#a7f3d0}
-  .badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:4px 6px 0 0}
-  .badge i{font-style:normal}
-  @media (max-width:900px){main{grid-template-columns:1fr;}}
+  small{color:var(--muted)} code{color:#155e75}
+  .section-title{font-weight:700;margin:0 0 8px 0}
+  textarea{width:100%;min-height:90px;resize:vertical}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin-right:6px;margin-top:4px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:900px){.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>Money Mind — Save Instead</h1>
-      <div class="sub">A tiny app that helps you save money you were about to spend.</div>
-    </div>
+    <h1>💡 Money Mind</h1>
     <div class="row">
-      <label for="currency" class="sub">Currency</label>
+      <label for="currency"><small>Currency</small></label>
       <select id="currency">
         <option value="USD">USD $</option>
         <option value="EUR">EUR €</option>
@@ -46,309 +49,303 @@
   </header>
 
   <main>
+    <!-- Capture & Metrics -->
     <section class="card">
-      <div class="between"><strong>Total Saved</strong><strong id="total"></strong></div>
-      <div class="progress" style="margin:8px 0"><div class="bar" id="bar" style="width:0%"></div></div>
-      <div class="between"><small>Goal</small><small id="goalText"></small></div>
+      <div class="metrics">
+        <div class="metric"><b>This month</b><strong id="mThis">$0.00</strong></div>
+        <div class="metric"><b>Streak</b><strong id="mStreak">0 days</strong></div>
+        <div class="metric"><b>Lifetime</b><strong id="mLife">$0.00</strong></div>
+        <div class="metric"><b>Total Saved (all time)</b><strong id="mTotal">$0.00</strong></div>
+      </div>
 
-      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
-
-      <div class="row">
-        <input id="amount" type="text" placeholder="Amount you just didn't spend (e.g. 12.99)" style="flex:1">
+      <div class="row" style="margin-top:12px">
+        <input id="amount" type="text" placeholder="Almost spent… e.g. 12.00" style="flex:1">
+        <select id="category">
+          <option value="Coffee">Coffee</option>
+          <option value="Snacks">Snacks</option>
+          <option value="Clothes">Clothes</option>
+          <option value="Gadgets">Gadgets</option>
+          <option value="Ride">Ride</option>
+        </select>
+        <input id="note" placeholder="Notes (optional)" style="flex:1">
         <button id="save" class="primary">Save Instead</button>
       </div>
-      <div class="chips" style="margin-top:8px">
+      <div class="chips">
         <div class="chip" data-amt="5">$5</div>
         <div class="chip" data-amt="10">$10</div>
         <div class="chip" data-amt="20">$20</div>
-        <div class="chip" data-amt="50">$50</div>
       </div>
 
-      <div class="row" style="margin-top:12px">
-        <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal (e.g. 200)" style="flex:1">
-        <button id="gAdd" class="success">Set/Update Goal</button>
-        <button id="hExport">Export CSV</button>
+      <div class="row" style="margin-top:8px">
+        <small>Make it viral — share your referral link with friends</small>
+        <button id="share" class="ghost" style="margin-left:auto">Copy Link</button>
       </div>
+    </section>
 
-      <div class="row" style="margin-top:12px">
-        <label for="hFilter" class="sub">History</label>
-        <select id="hFilter">
-          <option value="all">All</option>
-          <option value="week">Last 7 days</option>
-          <option value="month">Last 30 days</option>
-        </select>
+    <!-- Suggestions -->
+    <section class="card">
+      <h3 class="section-title">Suggestions</h3>
+      <div id="suggestions">Make a few saves and I’ll suggest something useful you can do with that money.</div>
+    </section>
+
+    <!-- Goals -->
+    <section class="card">
+      <h3 class="section-title">Savings Goals (Multiple)</h3>
+      <div class="row">
+        <input id="goalName" placeholder="Goal name" style="flex:1">
+        <input id="goalIn" type="number" min="1" step="1" placeholder="Target (e.g., 200)">
+        <input id="goalAlloc" type="number" min="0" max="100" step="1" placeholder="% alloc (e.g., 40)">
+        <button id="gAdd" class="ghost">Add/Update</button>
       </div>
+      <div class="progress" style="margin-top:10px"><div class="bar" id="bar" style="width:0%"></div></div>
+      <div class="between" style="margin-top:6px"><small>Goal</small><small id="goalText">—</small></div>
+      <div id="goalsList" style="margin-top:8px"></div>
+    </section>
 
+    <!-- History & CSV -->
+    <section class="card">
+      <div class="between">
+        <h3 class="section-title" style="margin:0">History & CSV</h3>
+        <div class="row">
+          <button id="hExport" class="ghost">Export CSV</button>
+          <select id="hFilter">
+            <option value="all">All</option>
+            <option value="week">Last 7 days</option>
+            <option value="month">Last 30 days</option>
+          </select>
+        </div>
+      </div>
       <ul id="history" style="margin-top:8px"></ul>
     </section>
 
-    <aside class="card">
-      <h3 style="margin-top:0">Debts</h3>
+    <!-- Where You Saved & Future Value (layout shells like your screenshots) -->
+    <section class="grid-2">
+      <div class="card">
+        <h3 class="section-title">Where You Saved (This Month)</h3>
+        <textarea id="whereSaved" placeholder="(Placeholder for chart)\nCoffee — $15\nSnacks — $8\n…"></textarea>
+      </div>
+      <div class="card">
+        <h3 class="section-title">Future Value</h3>
+        <div class="row">
+          <small>Years</small><input id="fvYears" type="range" min="0" max="10" step="1" value="1" style="flex:1"><small id="fvYearsLbl">1y</small>
+          <small style="margin-left:12px">Rate %</small><input id="fvRate" type="range" min="0" max="15" step="1" value="4" style="flex:1"><small id="fvRateLbl">4%</small>
+        </div>
+        <textarea id="fvOut" style="margin-top:8px" placeholder="(Projection will appear here)"></textarea>
+      </div>
+    </section>
+
+    <!-- Debt Snowball -->
+    <section class="card">
+      <h3 class="section-title">Debt Snowball</h3>
       <div class="row">
-        <input id="debtName" placeholder="Name (e.g. Card A)">
+        <label class="pill">Strategy <select id="debtStrategy"><option value="avalanche">Avalanche</option><option value="snowball">Snowball</option></select></label>
+        <label class="pill">Alloc % <input id="debtAlloc" type="range" min="0" max="100" step="1" value="40"> <small id="allocLbl">40%</small></label>
+        <input id="debtName" placeholder="Debt (Visa)">
         <input id="debtBal" type="number" step="0.01" placeholder="Balance">
-        <input id="debtAPR" type="number" step="0.01" placeholder="APR %">
-        <input id="debtMin" type="number" step="0.01" placeholder="Min/mo">
-        <button id="debtAdd">Add</button>
+        <input id="debtAPR" type="number" step="0.01" placeholder="APR%">
+        <input id="debtMin" type="number" step="0.01" placeholder="Min">
+        <button id="debtAdd" class="ghost">Add</button>
+      </div>
+      <textarea id="debtBox" style="margin-top:8px" placeholder="(Debt plan will display here)"></textarea>
+    </section>
+
+    <!-- Budget Coach -->
+    <section class="card">
+      <h3 class="section-title">Budget Coach</h3>
+      <small>Ask something like: “Can I afford $50 shoes?”</small>
+      <div class="row" style="margin-top:8px">
+        <input id="question" placeholder="Ask the coach…" style="flex:1">
+        <button id="ask" class="ghost">Ask Coach</button>
+      </div>
+      <div id="coachText" class="pill" style="margin-top:8px"></div>
+    </section>
+
+    <!-- Competitions -->
+    <section class="card">
+      <h3 class="section-title">Competitions</h3>
+      <div class="row">
+        <input id="nameIn" placeholder="Your name" style="flex:1">
+        <select id="regionIn">
+          <option value="NA">North America</option><option value="EU">Europe</option><option value="AS">Asia</option>
+          <option value="SA">South America</option><option value="AF">Africa</option><option value="OC">Oceania</option>
+        </select>
       </div>
       <div class="row" style="margin-top:8px">
-        <label for="debtStrategy" class="sub">Strategy</label>
-        <select id="debtStrategy">
-          <option value="snowball">Snowball (lowest balance first)</option>
-          <option value="avalanche">Avalanche (highest APR first)</option>
-        </select>
-        <label for="debtAlloc" class="sub">Extra $/mo</label>
-        <input id="debtAlloc" type="number" step="1" value="0" style="width:120px">
+        <input id="groupIn" placeholder="Group code (friends)" style="flex:1">
+        <button id="groupCreate">Create</button>
+        <button id="groupJoin">Join</button>
+        <button id="groupShare">Share</button>
+        <select id="boardMode" style="margin-left:auto"><option value="friends">Friends</option><option value="region">Region</option><option value="world">World</option></select>
       </div>
-      <ul id="debtList" style="margin-top:8px"></ul>
-      <div id="debtAdvice" class="sub" style="margin-top:8px"></div>
-
-      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
-
-      <h3 style="margin-top:0">Future Value (Projection)</h3>
-      <div class="row">
-        <label class="sub" for="fvYears">Years</label>
-        <input id="fvYears" type="number" min="0" step="1" value="1" style="width:90px">
-        <label class="sub" for="fvRate">Rate %</label>
-        <input id="fvRate" type="number" step="0.1" value="4" style="width:90px">
-      </div>
-      <div id="fvOut" style="margin-top:8px"><small>—</small></div>
-
-      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
-
-      <h3 style="margin-top:0">Streak & Badges</h3>
-      <div class="between"><div><strong>Current Streak</strong></div><div><strong id="streakCount">0</strong> day(s)</div></div>
-      <div class="sub" id="lastSaveText" style="margin-top:4px">Last save: —</div>
-      <div id="badges" style="margin-top:8px"></div>
-
-      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
-
-      <div class="between">
-        <button id="share">Share</button>
-        <button id="ask">Ask Coach</button>
-      </div>
-      <div id="coachText" class="sub" style="margin-top:8px"></div>
-    </aside>
+      <small id="boardTip" class="tip">Create or join a group to see your friends leaderboard.</small>
+      <ul id="board" style="margin-top:8px"></ul>
+    </section>
   </main>
 
 <script>
 // ---------- Helpers & State ----------
 const $ = (id) => document.getElementById(id);
 const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges' };
+const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals' };
 const state = {
   cur: localStorage.getItem(K.CUR) || 'USD',
   goal: +(localStorage.getItem(K.GOAL) || 200),
-  hist: JSON.parse(localStorage.getItem(K.HIST) || '[]'),
+  hist: JSON.parse(localStorage.getItem(K.HIST) || '[]'), // {ts,amt,cat,note}
   debts: JSON.parse(localStorage.getItem(K.DEBTS) || '[]'),
-  debtStrat: localStorage.getItem(K.STRAT) || 'snowball',
+  debtStrat: localStorage.getItem(K.STRAT) || 'avalanche',
   streak: +(localStorage.getItem(K.STREAK) || 0),
   lastSave: localStorage.getItem(K.LAST) || null,
-  badges: JSON.parse(localStorage.getItem(K.BADGES) || '[]') // [{id,label,icon,ts}]
+  profile: JSON.parse(localStorage.getItem(K.PROFILE) || '{"name":"","region":"NA"}'),
+  group: localStorage.getItem(K.GROUP) || (new URLSearchParams(location.search).get('group') || ''),
+  goals: JSON.parse(localStorage.getItem(K.GOALS) || '[]') // [{name,target,alloc}]
 };
 
 function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
 function fmt(n){ return C[state.cur] + (Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})); }
 function nowISO(){ return new Date().toISOString(); }
 function ymd(d){ const x = new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+function thisMonth(ts){ const d=new Date(ts); const n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
+function hash(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function prng(seed){ let x = seed>>>0; return ()=> (x = (x*1664525 + 1013904223)>>>0) / 0xFFFFFFFF; }
 
 // ---------- Core Actions ----------
 function saveInstead(amt){
   amt = Number(amt);
   if(!amt || amt<=0) return;
-  state.hist.push({ ts: nowISO(), amt });
+  const rec = { ts: nowISO(), amt, cat: $("category").value, note: $("note").value.trim() };
+  state.hist.push(rec);
   setk(K.HIST, state.hist);
   updateStreakOnSave();
-  awardBadges();
+  suggest(rec);
   render();
 }
-
 function upsertGoal(){
-  const g = +($("goalIn").value || 0);
-  if(!g || g<=0) return;
-  state.goal = g;
-  setk(K.GOAL, g);
+  const name = $("goalName").value.trim(); const target = +($("goalIn").value||0); const alloc = +($("goalAlloc").value||0);
+  if(!name || !target) return;
+  const i = state.goals.findIndex(g=>g.name.toLowerCase()===name.toLowerCase());
+  if(i>=0) state.goals[i] = {name,target,alloc}; else state.goals.push({name,target,alloc});
+  setk(K.GOALS,state.goals); state.goal = target; setk(K.GOAL,target);
   render();
 }
-
 function exportCSV(){
-  const rows = [["date","amount"]].concat(state.hist.map(h=>[h.ts, h.amt]));
+  const rows = [["date","amount","category","note"]].concat(state.hist.map(h=>[h.ts,h.amt,h.cat||'',(h.note||'').replace(/,/g,';')]));
   const csv = rows.map(r=>r.join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='money-mind-history.csv'; a.click(); URL.revokeObjectURL(url);
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='money-mind-history.csv'; a.click(); URL.revokeObjectURL(url);
 }
 
-function renderHistory(){ render(); }
+// ---------- Suggestions ----------
+function suggest(rec){
+  const saved = totalSaved();
+  const tip = saved >= 100 ? `Nice! You’ve saved ${fmt(saved)}. Consider moving $${Math.max(10,Math.round(saved*0.1))} to a high‑yield account.` : `Great job! Keep going — small wins add up.`;
+  $("suggestions").textContent = tip;
+}
 
-// ---------- Streak & Badges Logic ----------
+// ---------- Streak ----------
 function updateStreakOnSave(){
   const today = ymd(new Date());
   const last = state.lastSave ? ymd(state.lastSave) : null;
-  if(last === today){
-    // same day, keep streak
-  } else if(last && isYesterday(last, today)){
-    state.streak = (state.streak||0) + 1;
-  } else {
-    state.streak = 1; // new streak
-  }
-  state.lastSave = new Date().toISOString();
-  setk(K.STREAK, state.streak);
-  setk(K.LAST, state.lastSave);
+  if(last === today){ /* same day */ }
+  else if(last && isYesterday(last)) state.streak = (state.streak||0) + 1; else state.streak = 1;
+  state.lastSave = new Date().toISOString(); setk(K.STREAK,state.streak); setk(K.LAST,state.lastSave);
 }
-function isYesterday(lastYmd, todayYmd){
-  const [y,m,d] = lastYmd.split('-').map(Number);
-  const last = new Date(y, m-1, d);
-  const y2 = new Date(); y2.setDate(y2.getDate()-1);
-  return ymd(last) === ymd(y2);
-}
+function isYesterday(lastYmd){ const y2=new Date(); y2.setDate(y2.getDate()-1); return lastYmd===ymd(y2); }
 
-function awardBadges(){
-  const saved = totalSaved();
-  const have = new Set(state.badges.map(b=>b.id));
-  const add = (id,label,icon)=>{ if(!have.has(id)){ state.badges.push({id,label,icon,ts:nowISO()}); setk(K.BADGES,state.badges);} };
-
-  if(saved >= 0 && !have.has('first') && state.hist.length>0) add('first','First Save','🎉');
-  if(saved >= 100) add('100','Saved $100','🏅');
-  if(saved >= 500) add('500','Saved $500','💰');
-  if(state.streak >= 3) add('streak3','3‑Day Streak','🔥');
-  if(state.streak >= 7) add('streak7','7‑Day Streak','🌟');
-}
-
-// ---------- Debt ----------
+// ---------- Debt (simple text view) ----------
 function drawDebt(){
-  setk(K.DEBTS, state.debts);
-  const list = $("debtList"); list.innerHTML='';
-  const debts = state.debtStrat==='snowball'
-    ? [...state.debts].sort((a,b)=>a.balance-b.balance)
-    : [...state.debts].sort((a,b)=>b.apr-a.apr);
-  debts.forEach(d=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="between"><div><strong>${d.name}</strong> <small>APR ${d.apr||0}%</small></div><div>${fmt(d.balance||0)}</div></div><small>Min: ${fmt(d.min||0)}</small>`;
-    list.appendChild(li);
-  });
-  $("debtAdvice").textContent = debts.length ? `Focus next: ${debts[0].name}` : '';
+  const strategy = $("debtStrategy").value; const alloc = +$("debtAlloc").value || 0; $("allocLbl").textContent = alloc+"%";
+  const out = state.debts.slice();
+  if(strategy==='snowball') out.sort((a,b)=>a.balance-b.balance); else out.sort((a,b)=>b.apr-a.apr);
+  const lines = out.map((d,i)=> `${i+1}. ${d.name} — Bal ${fmt(d.balance||0)}, APR ${d.apr||0}%${d.min?`, Min ${fmt(d.min)}`:''}`);
+  $("debtBox").value = lines.join("\n");
 }
 
-// ---------- FV ----------
+// ---------- Future Value ----------
 function drawFV(){
-  const years = +($("fvYears").value||0);
-  const rate = (+($("fvRate").value||0))/100;
-  const principal = totalSaved();
-  const fv = principal * Math.pow(1+rate, years);
-  $("fvOut").innerHTML = `<small>Projected value of your saved money in ${years} year(s) at ${(+rate*100).toFixed(1)}%: <strong>${fmt(fv)}</strong></small>`;
+  const years = +($("fvYears").value||0); const rate = (+($("fvRate").value||0))/100;
+  $("fvYearsLbl").textContent = years+"y"; $("fvRateLbl").textContent = Math.round(rate*100)+"%";
+  const principal = totalSaved(); const fv = principal * Math.pow(1+rate, years);
+  $("fvOut").value = `Projected value of your saved money in ${years} year(s) at ${(rate*100).toFixed(1)}%: ${fmt(fv)}`;
 }
 
-// ---------- Derived ----------
+// ---------- Derived & Metrics ----------
 function totalSaved(){ return state.hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
+function monthSaved(){ return state.hist.filter(h=>thisMonth(h.ts)).reduce((s,h)=>s + Number(h.amt||0), 0); }
+function renderMetrics(){
+  $("mThis").textContent = fmt(monthSaved());
+  $("mStreak").textContent = (state.streak||0) + ' days';
+  $("mLife").textContent = fmt(totalSaved());
+  $("mTotal").textContent = fmt(totalSaved());
+}
+
+// ---------- Leaderboard (mock deterministic) ----------
+function computeScore(){ return Math.round(totalSaved() + state.streak*5); }
+function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)] + ' ' + String.fromCharCode(65+Math.floor(rnd()*26)) + '.'); } return out; }
+function samplePeers(mode){ let seedStr = mode==='friends' && state.group ? 'G:'+state.group : mode+':'+(state.profile.region||'NA'); const rnd=prng(hash(seedStr)); const names=sampleNames(hash(seedStr)+12345); return names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); }
+function renderBoard(){ const mode=$("boardMode").value; const ul=$("board"); ul.innerHTML=''; const mine={name:state.profile.name||'You',score:computeScore(),me:true}; const peers=samplePeers(mode); const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,10); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); }); const tip=$("boardTip"); if(mode==='friends'&&!state.group){ tip.textContent='Create or join a group to compete with friends.';} else if(mode==='friends'&&state.group){ tip.textContent='Group: '+state.group+' — share this with friends.';} else if(mode==='region'){ tip.textContent='Showing top savers in your region.';} else { tip.textContent='Global leaderboard preview.'; } }
 
 // ---------- Render ----------
 function render(){
-  // currency select
   $("currency").value = state.cur;
-  // totals
-  const saved = totalSaved();
-  $("total").textContent = fmt(saved);
-  $("goalText").textContent = state.goal ? fmt(state.goal) : '—';
-  const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0;
-  $("bar").style.width = pct+"%";
+  // progress for primary goal
+  const saved = totalSaved(); $("goalText").textContent = state.goal?fmt(state.goal):'—';
+  const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0; $("bar").style.width = pct+"%";
 
   // history
-  const filt = $("hFilter").value;
-  const now = Date.now();
-  let items = [...state.hist];
+  const filt = $("hFilter").value; const now=Date.now(); let items=[...state.hist];
   if(filt==='week'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 7*24*3600*1000 ); }
   if(filt==='month'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 30*24*3600*1000 ); }
-  const ul = $("history"); ul.innerHTML='';
-  items.slice().reverse().forEach(h=>{
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="between"><div>${new Date(h.ts).toLocaleString()}</div><div>${fmt(h.amt)}</div></div>`;
-    ul.appendChild(li);
-  });
+  const ul=$("history"); ul.innerHTML=''; items.slice().reverse().forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class="between"><div>${new Date(h.ts).toLocaleString()}</div><div><strong>${fmt(h.amt)}</strong> <small>${h.cat||''}</small></div></div>${h.note?`<small>${h.note}</small>`:''}`; ul.appendChild(li); });
 
-  // debts & fv
-  drawDebt();
-  drawFV();
+  // goals list
+  const gl=$("goalsList"); gl.innerHTML=''; state.goals.forEach(g=>{ const span=document.createElement('span'); span.className='pill'; span.textContent=`${g.name}: ${fmt(g.target)} • ${g.alloc||0}%`; gl.appendChild(span); });
 
-  // streak & badges
-  $("streakCount").textContent = state.streak || 0;
-  $("lastSaveText").textContent = state.lastSave ? `Last save: ${new Date(state.lastSave).toLocaleDateString()}` : 'Last save: —';
-  const bb = $("badges"); bb.innerHTML='';
-  state.badges.forEach(b=>{
-    const div = document.createElement('span');
-    div.className='badge';
-    div.innerHTML = `<i>${b.icon}</i><span>${b.label}</span>`;
-    bb.appendChild(div);
-  });
+  // where saved (simple breakdown)
+  const byCat = {}; state.hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ byCat[h.cat||'Other']=(byCat[h.cat||'Other']||0)+Number(h.amt||0); });
+  const lines=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]).map(k=>`${k} — ${fmt(byCat[k])}`); $("whereSaved").value = lines.join("\n");
+
+  // other panels
+  drawDebt(); drawFV(); renderMetrics(); renderBoard();
 }
 
-// ---------- Listeners (no dead buttons) ----------
+// ---------- Listeners ----------
 document.addEventListener('DOMContentLoaded', function(){
   // currency
-  $("currency").addEventListener('change', function(e){
-    state.cur = e.target.value; setk(K.CUR, state.cur); render();
-  });
+  $("currency").addEventListener('change', function(e){ state.cur=e.target.value; setk(K.CUR,state.cur); render(); });
 
   // save
-  $("save").addEventListener('click', function(){
-    const el = $("amount");
-    const raw = el.value.replace(/[^0-9.]/g,'');
-    const amt = parseFloat(raw || '0');
-    if(!amt || amt<=0){ el.focus(); return; }
-    el.value=''; saveInstead(amt);
-  });
+  $("save").addEventListener('click', function(){ const el=$("amount"); const raw=el.value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt||amt<=0){ el.focus(); return; } saveInstead(amt); el.value=''; $("note").value=''; });
+  document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{ $("amount").value=b.getAttribute('data-amt'); }));
 
-  // chips
-  document.querySelectorAll('[data-amt]').forEach(b=>{
-    b.addEventListener('click', function(){ $("amount").value = this.getAttribute('data-amt'); });
-  });
-
-  // goal
+  // goals
   $("gAdd").addEventListener('click', upsertGoal);
 
   // export
   $("hExport").addEventListener('click', exportCSV);
+  $("hFilter").addEventListener('change', ()=>render());
 
-  // history filter
-  $("hFilter").addEventListener('change', renderHistory);
-
-  // debt add
-  $("debtAdd").addEventListener('click', function(){
-    const d = { name: $("debtName").value.trim(), balance:+$("debtBal").value||0, apr:+$("debtAPR").value||0, min:+$("debtMin").value||0 };
-    if(!d.name || !d.balance) return;
-    state.debts.push(d); setk(K.DEBTS, state.debts);
-    $("debtName").value = $("debtBal").value = $("debtAPR").value = $("debtMin").value = '';
-    drawDebt();
-  });
-
-  $("debtStrategy").value = state.debtStrat;
-  $("debtStrategy").addEventListener('change', function(e){ state.debtStrat = e.target.value; setk(K.STRAT, state.debtStrat); drawDebt(); });
+  // debt
+  $("debtAdd").addEventListener('click', function(){ const d={ name:$("debtName").value.trim(), balance:+$("debtBal").value||0, apr:+$("debtAPR").value||0, min:+$("debtMin").value||0 }; if(!d.name||!d.balance) return; state.debts.push(d); setk(K.DEBTS,state.debts); $("debtName").value=$("debtBal").value=$("debtAPR").value=$("debtMin").value=''; drawDebt(); });
+  $("debtStrategy").addEventListener('change', drawDebt);
   $("debtAlloc").addEventListener('input', drawDebt);
 
-  // FV
-  $("fvYears").addEventListener('input', drawFV);
-  $("fvRate").addEventListener('input', drawFV);
+  // FV sliders
+  $("fvYears").addEventListener('input', drawFV); $("fvRate").addEventListener('input', drawFV);
 
-  // Ask Coach (no backend required)
-  $("ask").addEventListener('click', function(){
-    const last = state.hist[state.hist.length-1];
-    $("ask").disabled = true; $("ask").textContent = '...';
-    setTimeout(function(){
-      const tip = last && last.amt >= 20 ? 'Great save! Consider moving it to a high‑yield bucket.' : 'Nice! Small saves add up — do another today.';
-      $("coachText").textContent = tip; $("ask").disabled=false; $("ask").textContent='Ask Coach';
-    }, 500);
-  });
+  // Coach (local demo)
+  $("ask").addEventListener('click', function(){ const q=$("question").value.trim(); $("ask").disabled=true; $("ask").textContent='…'; setTimeout(()=>{ const tip=q?`Rule of 30 uses: will you use it 30 times?`: 'Try the 24‑hour rule before big buys.'; $("coachText").textContent=tip; $("ask").disabled=false; $("ask").textContent='Ask Coach'; }, 500); });
 
   // Share
-  $("share").addEventListener('click', function(){
-    const url = location.origin + location.pathname + '?ref=money-mind';
-    try{
-      if(navigator.share){ navigator.share({title:'Money Mind', text:'I’m saving instead of spending. Join me!', url}); }
-      else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Share', 1200); }); }
-    }catch(_){/* ignore */}
-  });
+  $("share").addEventListener('click', function(){ const url=location.origin+location.pathname+(state.group?('?group='+encodeURIComponent(state.group)):''); try{ if(navigator.share){ navigator.share({title:'Money Mind',text:'Join my saving challenge!',url}); } else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Copy Link',1200); }); } }catch(_){} });
 
-  // initial render
+  // Competition inputs
+  $("nameIn").addEventListener('input', e=>{ state.profile.name=e.target.value; setk(K.PROFILE,state.profile); renderBoard(); });
+  $("regionIn").addEventListener('change', e=>{ state.profile.region=e.target.value; setk(K.PROFILE,state.profile); renderBoard(); });
+  $("boardMode").addEventListener('change', renderBoard);
+  $("groupCreate").addEventListener('click', ()=>{ const code=Math.random().toString(36).slice(2,8).toUpperCase(); state.group=code; setk(K.GROUP,code); $("groupIn").value=code; renderBoard(); });
+  $("groupJoin").addEventListener('click', ()=>{ const code=$("groupIn").value.trim().toUpperCase(); if(!code) return; state.group=code; setk(K.GROUP,code); renderBoard(); });
+  $("groupShare").addEventListener('click', ()=>{ const url=location.origin+location.pathname+'?group='+(state.group||''); if(!state.group){ alert('Create or enter a group code first.'); return; } try{ if(navigator.share){ navigator.share({title:'Join my Money Mind group', url}); } else { navigator.clipboard.writeText(url); } }catch(_){} });
+
   render();
 });
 </script>
