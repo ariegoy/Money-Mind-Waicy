@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Money Mind — Save Instead</title>
+<style>
+  :root{--bg:#0b1220;--fg:#e6eefb;--muted:#9fb4d9;--accent:#4f9cff;--ok:#22c55e;--warn:#ef4444;--card:#141c2e;--line:#22304d}
+  *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
+  header{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:20px;font-weight:800} .sub{color:var(--muted);font-size:12px}
+  main{padding:16px;display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .row{display:flex;gap:8px;align-items:center}
+  .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  input,select,button{border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);padding:10px}
+  button{cursor:pointer} button.primary{border-color:var(--accent);color:var(--accent)}
+  button.success{border-color:var(--ok);color:var(--ok)} button.warn{border-color:var(--warn);color:var(--warn)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted)}
+  .progress{height:10px;background:#0f172a;border-radius:12px;overflow:hidden}
+  .bar{height:100%;background:var(--ok)}
+  ul{list-style:none;margin:0;padding:0}
+  li{padding:8px 0;border-bottom:1px solid var(--line)}
+  small{color:var(--muted)} code{color:#a7f3d0}
+  @media (max-width:900px){main{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Money Mind — Save Instead</h1>
+      <div class="sub">A tiny app that helps you save money you were about to spend.</div>
+    </div>
+    <div class="row">
+      <label for="currency" class="sub">Currency</label>
+      <select id="currency">
+        <option value="USD">USD $</option>
+        <option value="EUR">EUR €</option>
+        <option value="GBP">GBP £</option>
+        <option value="INR">INR ₹</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="between"><strong>Total Saved</strong><strong id="total"></strong></div>
+      <div class="progress" style="margin:8px 0"><div class="bar" id="bar" style="width:0%"></div></div>
+      <div class="between"><small>Goal</small><small id="goalText"></small></div>
+
+      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
+
+      <div class="row">
+        <input id="amount" type="text" placeholder="Amount you just didn't spend (e.g. 12.99)" style="flex:1">
+        <button id="save" class="primary">Save Instead</button>
+      </div>
+      <div class="chips" style="margin-top:8px">
+        <div class="chip" data-amt="5">$5</div>
+        <div class="chip" data-amt="10">$10</div>
+        <div class="chip" data-amt="20">$20</div>
+        <div class="chip" data-amt="50">$50</div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal (e.g. 200)" style="flex:1">
+        <button id="gAdd" class="success">Set/Update Goal</button>
+        <button id="hExport">Export CSV</button>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <label for="hFilter" class="sub">History</label>
+        <select id="hFilter">
+          <option value="all">All</option>
+          <option value="week">Last 7 days</option>
+          <option value="month">Last 30 days</option>
+        </select>
+      </div>
+
+      <ul id="history" style="margin-top:8px"></ul>
+    </section>
+
+    <aside class="card">
+      <h3 style="margin-top:0">Debts</h3>
+      <div class="row">
+        <input id="debtName" placeholder="Name (e.g. Card A)">
+        <input id="debtBal" type="number" step="0.01" placeholder="Balance">
+        <input id="debtAPR" type="number" step="0.01" placeholder="APR %">
+        <input id="debtMin" type="number" step="0.01" placeholder="Min/mo">
+        <button id="debtAdd">Add</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <label for="debtStrategy" class="sub">Strategy</label>
+        <select id="debtStrategy">
+          <option value="snowball">Snowball (lowest balance first)</option>
+          <option value="avalanche">Avalanche (highest APR first)</option>
+        </select>
+        <label for="debtAlloc" class="sub">Extra $/mo</label>
+        <input id="debtAlloc" type="number" step="1" value="0" style="width:120px">
+      </div>
+      <ul id="debtList" style="margin-top:8px"></ul>
+      <div id="debtAdvice" class="sub" style="margin-top:8px"></div>
+
+      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
+
+      <h3 style="margin-top:0">Future Value (Projection)</h3>
+      <div class="row">
+        <label class="sub" for="fvYears">Years</label>
+        <input id="fvYears" type="number" min="0" step="1" value="1" style="width:90px">
+        <label class="sub" for="fvRate">Rate %</label>
+        <input id="fvRate" type="number" step="0.1" value="4" style="width:90px">
+      </div>
+      <div id="fvOut" style="margin-top:8px"><small>—</small></div>
+
+      <hr style="border-color:var(--line);opacity:.4;margin:12px 0">
+
+      <div class="between">
+        <button id="share">Share</button>
+        <button id="ask">Ask Coach</button>
+      </div>
+      <div id="coachText" class="sub" style="margin-top:8px"></div>
+    </aside>
+  </main>
+
+<script>
+// ---------- Helpers & State ----------
+const $ = (id) => document.getElementById(id);
+const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
+const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat' };
+const state = {
+  cur: localStorage.getItem(K.CUR) || 'USD',
+  goal: +(localStorage.getItem(K.GOAL) || 200),
+  hist: JSON.parse(localStorage.getItem(K.HIST) || '[]'),
+  debts: JSON.parse(localStorage.getItem(K.DEBTS) || '[]'),
+  debtStrat: localStorage.getItem(K.STRAT) || 'snowball'
+};
+
+function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
+function fmt(n){ return C[state.cur] + (Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})); }
+function nowISO(){ return new Date().toISOString(); }
+
+// ---------- Core Actions ----------
+function saveInstead(amt){
+  amt = Number(amt);
+  if(!amt || amt<=0) return;
+  state.hist.push({ ts: nowISO(), amt });
+  setk(K.HIST, state.hist);
+  render();
+}
+
+function upsertGoal(){
+  const g = +($("goalIn").value || 0);
+  if(!g || g<=0) return;
+  state.goal = g;
+  setk(K.GOAL, g);
+  render();
+}
+
+function exportCSV(){
+  const rows = [["date","amount"]].concat(state.hist.map(h=>[h.ts, h.amt]));
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='money-mind-history.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+function renderHistory(){ render(); }
+
+// ---------- Debt ----------
+function drawDebt(){
+  setk(K.DEBTS, state.debts);
+  const list = $("debtList"); list.innerHTML='';
+  const debts = state.debtStrat==='snowball'
+    ? [...state.debts].sort((a,b)=>a.balance-b.balance)
+    : [...state.debts].sort((a,b)=>b.apr-a.apr);
+  debts.forEach(d=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="between"><div><strong>${d.name}</strong> <small>APR ${d.apr||0}%</small></div><div>${fmt(d.balance||0)}</div></div><small>Min: ${fmt(d.min||0)}</small>`;
+    list.appendChild(li);
+  });
+  $("debtAdvice").textContent = debts.length ? `Focus next: ${debts[0].name}` : '';
+}
+
+// ---------- FV ----------
+function drawFV(){
+  const years = +($("fvYears").value||0);
+  const rate = (+($("fvRate").value||0))/100;
+  const principal = totalSaved();
+  const fv = principal * Math.pow(1+rate, years);
+  $("fvOut").innerHTML = `<small>Projected value of your saved money in ${years} year(s) at ${(+rate*100).toFixed(1)}%: <strong>${fmt(fv)}</strong></small>`;
+}
+
+// ---------- Derived ----------
+function totalSaved(){ return state.hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
+
+// ---------- Render ----------
+function render(){
+  // currency select
+  $("currency").value = state.cur;
+  // totals
+  const saved = totalSaved();
+  $("total").textContent = fmt(saved);
+  $("goalText").textContent = state.goal ? fmt(state.goal) : '—';
+  const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0;
+  $("bar").style.width = pct+"%";
+
+  // history
+  const filt = $("hFilter").value;
+  const now = Date.now();
+  let items = [...state.hist];
+  if(filt==='week'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 7*24*3600*1000 ); }
+  if(filt==='month'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 30*24*3600*1000 ); }
+  const ul = $("history"); ul.innerHTML='';
+  items.slice().reverse().forEach(h=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="between"><div>${new Date(h.ts).toLocaleString()}</div><div>${fmt(h.amt)}</div></div>`;
+    ul.appendChild(li);
+  });
+
+  // debts & fv
+  drawDebt();
+  drawFV();
+}
+
+// ---------- Listeners (no dead buttons) ----------
+document.addEventListener('DOMContentLoaded', function(){
+  // currency
+  $("currency").addEventListener('change', function(e){
+    state.cur = e.target.value; setk(K.CUR, state.cur); render();
+  });
+
+  // save
+  $("save").addEventListener('click', function(){
+    const el = $("amount");
+    const raw = el.value.replace(/[^0-9.]/g,'');
+    const amt = parseFloat(raw || '0');
+    if(!amt || amt<=0){ el.focus(); return; }
+    el.value=''; saveInstead(amt);
+  });
+
+  // chips
+  document.querySelectorAll('[data-amt]').forEach(b=>{
+    b.addEventListener('click', function(){ $("amount").value = this.getAttribute('data-amt'); });
+  });
+
+  // goal
+  $("gAdd").addEventListener('click', upsertGoal);
+
+  // export
+  $("hExport").addEventListener('click', exportCSV);
+
+  // history filter
+  $("hFilter").addEventListener('change', renderHistory);
+
+  // debt add
+  $("debtAdd").addEventListener('click', function(){
+    const d = { name: $("debtName").value.trim(), balance:+$("debtBal").value||0, apr:+$("debtAPR").value||0, min:+$("debtMin").value||0 };
+    if(!d.name || !d.balance) return;
+    state.debts.push(d); setk(K.DEBTS, state.debts);
+    $("debtName").value = $("debtBal").value = $("debtAPR").value = $("debtMin").value = '';
+    drawDebt();
+  });
+
+  $("debtStrategy").value = state.debtStrat;
+  $("debtStrategy").addEventListener('change', function(e){ state.debtStrat = e.target.value; setk(K.STRAT, state.debtStrat); drawDebt(); });
+  $("debtAlloc").addEventListener('input', drawDebt);
+
+  // FV
+  $("fvYears").addEventListener('input', drawFV);
+  $("fvRate").addEventListener('input', drawFV);
+
+  // Ask Coach (no backend required)
+  $("ask").addEventListener('click', function(){
+    const last = state.hist[state.hist.length-1];
+    $("ask").disabled = true; $("ask").textContent = '...';
+    setTimeout(function(){
+      const tip = last && last.amt >= 20 ? 'Great save! Consider moving it to a high‑yield bucket.' : 'Nice! Small saves add up — do another today.';
+      $("coachText").textContent = tip; $("ask").disabled=false; $("ask").textContent='Ask Coach';
+    }, 500);
+  });
+
+  // Share
+  $("share").addEventListener('click', function(){
+    const url = location.origin + location.pathname + '?ref=money-mind';
+    try{
+      if(navigator.share){ navigator.share({title:'Money Mind', text:'I’m saving instead of spending. Join me!', url}); }
+      else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Share', 1200); }); }
+    }catch(_){/* ignore */}
+  });
+
+  // initial render
+  render();
+});
+</script>
+</body>
+</html>
