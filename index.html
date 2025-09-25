@@ -98,6 +98,24 @@
     <section class="card">
       <h3 class="section-title">Mini Leaderboard (Demo)</h3>
       <ul id="miniBoard"></ul>
+   function ensureMiniBoard() {
+  const ul = $("miniBoard");
+  if (!ul) return;
+  // If mini board has no items, inject a safe fallback set
+  if (!ul.children.length) {
+    const fallback = [
+      { name: "Alex T.", score: 240 },
+      { name: "Jordan S.", score: 210 },
+      { name: (state.profile.name || "You"), score: computeScore() || 180 }
+    ];
+    ul.innerHTML = "";
+    fallback.forEach((p, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<div class="between"><div>${i + 1}. <strong>${p.name}</strong>${p.name === "You" ? " <small>(you)</small>" : ""}</div><div>${p.score}</div></div>`;
+      ul.appendChild(li);
+    });
+  }
+} 
     </section>
 
     <!-- Categories (user-generated) -->
