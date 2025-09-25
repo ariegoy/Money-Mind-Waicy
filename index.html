@@ -7,8 +7,11 @@
 <style>
   :root{--bg:#f4f6f8;--fg:#0f172a;--muted:#6b7280;--accent:#2563eb;--ok:#16a34a;--warn:#ef4444;--card:#ffffff;--line:#e5e7eb}
   *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
-  header{padding:18px 20px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+  header{padding:12px 16px 0 16px;display:flex;flex-direction:column;gap:8px}
+  .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
   h1{margin:0;font-size:22px;font-weight:800}
+  .quote-banner{background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:8px 12px;font-size:14px}
+  .quote-banner b{color:#a7f3d0}
   main{padding:16px;display:grid;grid-template-columns:1fr;gap:16px;max-width:1100px;margin:0 auto}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
   .row{display:flex;gap:10px;align-items:center}
@@ -41,21 +44,24 @@
   /* confetti */
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.8}}
+  .xbtn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px 8px;cursor:pointer;color:#ef4444}
+  /* toast */
+  .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:99999}
+  .toast.show{opacity:1;transform:translateY(0)}
   @media (max-width:900px){.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.badgegrid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
   <header>
-    <h1>💡 Money Mind</h1>
-    <div class="row">
-      <label for="currency"><small>Currency</small></label>
-      <select id="currency">
-        <option value="USD">USD $</option>
-        <option value="EUR">EUR €</option>
-        <option value="GBP">GBP £</option>
-        <option value="INR">INR ₹</option>
-      </select>
+    <div class="header-row">
+      <h1>💡 Money Mind</h1>
+      <div class="row">
+        <label for="currency"><small>Currency</small></label>
+        <select id="currency"></select>
+        <label class="row" style="gap:6px"><input type="checkbox" id="soundToggle"> <small>Sound</small></label>
+      </div>
     </div>
+    <div id="dailyQuote" class="quote-banner">💬 <b>Quote of the day:</b> <span id="qodText">Small wins add up to big success.</span></div>
   </header>
 
   <main>
@@ -70,13 +76,7 @@
 
       <div class="row" style="margin-top:12px">
         <input id="amount" type="text" placeholder="Almost spent… e.g. 12.00" style="flex:1">
-        <select id="category">
-          <option value="Coffee">Coffee</option>
-          <option value="Snacks">Snacks</option>
-          <option value="Clothes">Clothes</option>
-          <option value="Gadgets">Gadgets</option>
-          <option value="Ride">Ride</option>
-        </select>
+        <select id="category"></select>
         <input id="note" placeholder="Notes (optional)" style="flex:1">
         <button id="save" class="primary">Save Instead</button>
       </div>
@@ -85,17 +85,30 @@
         <div class="chip" data-amt="10">$10</div>
         <div class="chip" data-amt="20">$20</div>
       </div>
-
-      <div class="row" style="margin-top:8px">
-        <small>Make it viral — share your referral link with friends</small>
-        <button id="share" class="ghost" style="margin-left:auto">Copy Link</button>
-      </div>
     </section>
 
-    <!-- Suggestions -->
+    <!-- Suggestions / Quotes -->
     <section class="card">
       <h3 class="section-title">Suggestions</h3>
       <div id="suggestions">Make a few saves and I’ll suggest something useful you can do with that money.</div>
+      <div id="quote" style="margin-top:8px;color:#065f46;font-weight:600"></div>
+    </section>
+
+    <!-- Mini Leaderboard (demo-friendly) -->
+    <section class="card">
+      <h3 class="section-title">Mini Leaderboard (Demo)</h3>
+      <ul id="miniBoard"></ul>
+    </section>
+
+    <!-- Categories (user-generated) -->
+    <section class="card">
+      <h3 class="section-title">Categories</h3>
+      <div class="row">
+        <input id="catName" placeholder="Add a category (e.g., Books)" style="flex:1">
+        <button id="catAdd" class="ghost">Add</button>
+      </div>
+      <div id="catList" class="chips" style="margin-top:8px"></div>
+      <small class="tip">Tip: These appear in the Save Instead dropdown.</small>
     </section>
 
     <!-- Goals -->
@@ -134,7 +147,7 @@
       <ul id="history" style="margin-top:8px"></ul>
     </section>
 
-    <!-- Where You Saved & Future Value (layout shells like your screenshots) -->
+    <!-- Where You Saved & Future Value -->
     <section class="grid-2">
       <div class="card">
         <h3 class="section-title">Where You Saved (This Month)</h3>
@@ -206,11 +219,26 @@
     </section>
   </main>
 
+  <div id="toast" class="toast"></div>
+
 <script>
 // ---------- Helpers & State ----------
 const $ = (id) => document.getElementById(id);
 const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals', SHARED:'mm_shared', MILE:'mm_goal_milestone' };
+const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals', SHARED:'mm_shared', MILE:'mm_goal_milestone', CATS:'mm_cats', SOUND:'mm_sound' };
+const DEFAULT_CATS = ['Coffee','Snacks','Clothes','Gadgets','Rides'];
+const QUOTES = [
+  'Small wins add up to big success.',
+  'You just paid your future self.',
+  'Skip a treat, grow a streak.',
+  'Save today, thank yourself tomorrow.',
+  'Consistency beats intensity.',
+  'Every $5 counts — keep going!',
+  'One less impulse, one step closer.',
+  'Tiny habits → huge outcomes.',
+  'Great job — keep the momentum!',
+  'Invest in your goals, not impulses.'
+];
 const state = {
   cur: localStorage.getItem(K.CUR) || 'USD',
   goal: +(localStorage.getItem(K.GOAL) || 200),
@@ -224,7 +252,9 @@ const state = {
   goals: JSON.parse(localStorage.getItem(K.GOALS) || '[]'), // [{name,target,alloc}]
   badges: JSON.parse(localStorage.getItem(K.BADGES) || '[]'), // [{id,label,icon,ts}]
   sharedOnce: localStorage.getItem(K.SHARED) === '1',
-  milestone: +(localStorage.getItem(K.MILE) || 0) // highest % milestone hit (0,25,50,75,100)
+  milestone: +(localStorage.getItem(K.MILE) || 0),
+  cats: JSON.parse(localStorage.getItem(K.CATS) || 'null') || DEFAULT_CATS.slice(),
+  sound: localStorage.getItem(K.SOUND) !== '0' // default on
 };
 
 function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
@@ -234,15 +264,44 @@ function ymd(d){ const x = new Date(d); return x.getFullYear()+'-'+String(x.getM
 function thisMonth(ts){ const d=new Date(ts); const n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
 function hash(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
 function prng(seed){ let x = seed>>>0; return ()=> (x = (x*1664525 + 1013904223)>>>0) / 0xFFFFFFFF; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ---------- Audio (ding) ----------
+let audioCtx;
+function playDing(){
+  if(!state.sound) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880; // A5
+    g.gain.value=0.0001; g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.25);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.28);
+  }catch(e){}
+}
+
+// ---------- Toast ----------
+let toastTimer=null;
+function showToast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 1800);
+}
 
 // ---------- Core Actions ----------
 function saveInstead(amt){
   amt = Number(amt);
   if(!amt || amt<=0) return;
-  const rec = { ts: nowISO(), amt, cat: $("category").value, note: $("note").value.trim() };
+  // get selected cat; ensure exists
+  let catSel = $("category").value;
+  if(!state.cats.includes(catSel)) { state.cats.push(catSel); setk(K.CATS,state.cats); populateCategories(); }
+  const rec = { ts: nowISO(), amt, cat: catSel, note: $("note").value.trim() };
   state.hist.push(rec); setk(K.HIST, state.hist);
   updateStreakOnSave();
   suggest(rec);
+  // inspirational quote + sound + toast
+  $("quote").textContent = '💡 ' + pick(QUOTES);
+  playDing();
+  showToast(`Saved ${fmt(amt)} instead 🎉`);
   awardBadges();
   render();
 }
@@ -333,19 +392,19 @@ function confetti(count=120, duration=1600){
     setTimeout(()=>el.remove(), duration+700);
   }
 }
-
 function checkMilestones(pct){
   const marks=[25,50,75,100];
   for(const m of marks){
     if(pct>=m && state.milestone < m){
       state.milestone = m; setk(K.MILE,String(m));
       confetti();
+      showToast(`${m}% goal milestone reached 🎯`);
       break;
     }
   }
 }
 
-// ---------- Debt (simple text view) ----------
+// ---------- Debt ----------
 function drawDebt(){
   const strategy = $("debtStrategy").value; const alloc = +$("debtAlloc").value || 0; $("allocLbl").textContent = alloc+"%";
   const out = state.debts.slice();
@@ -372,22 +431,54 @@ function renderMetrics(){
   $("mTotal").textContent = fmt(totalSaved());
 }
 
-// ---------- Leaderboard (mock deterministic) ----------
+// ---------- Leaderboards ----------
 function computeScore(){ return Math.round(totalSaved() + state.streak*5); }
 function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)] + ' ' + String.fromCharCode(65+Math.floor(rnd()*26)) + '.'); } return out; }
 function samplePeers(mode){ let seedStr = mode==='friends' && state.group ? 'G:'+state.group : mode+':'+(state.profile.region||'NA'); const rnd=prng(hash(seedStr)); const names=sampleNames(hash(seedStr)+12345); return names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); }
 function renderBoard(){ const mode=$("boardMode").value; const ul=$("board"); ul.innerHTML=''; const mine={name:state.profile.name||'You',score:computeScore(),me:true}; const peers=samplePeers(mode); const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,10); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); }); const tip=$("boardTip"); if(mode==='friends'&&!state.group){ tip.textContent='Create or join a group to compete with friends.';} else if(mode==='friends'&&state.group){ tip.textContent='Group: '+state.group+' — share this with friends.';} else if(mode==='region'){ tip.textContent='Showing top savers in your region.';} else { tip.textContent='Global leaderboard preview.'; } }
+function renderMiniBoard(){
+  const ul=$("miniBoard"); ul.innerHTML='';
+  const mine={name:state.profile.name||'You',score:computeScore(),me:true};
+  const peers=samplePeers('friends').slice(0,3);
+  const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,3);
+  all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); });
+}
+
+// ---------- Categories UI ----------
+function populateCategories(){
+  const sel = $("category"); sel.innerHTML='';
+  state.cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+function renderCatChips(){
+  const wrap=$("catList"); wrap.innerHTML='';
+  state.cats.forEach((c,idx)=>{
+    const chip=document.createElement('span'); chip.className='pill'; chip.textContent=c+' ';
+    const del=document.createElement('button'); del.className='xbtn'; del.textContent='×'; del.title='Remove';
+    del.onclick=()=>{ state.cats.splice(idx,1); if(state.cats.length===0){ state.cats=DEFAULT_CATS.slice(); } setk(K.CATS,state.cats); populateCategories(); renderCatChips(); render(); };
+    chip.appendChild(del); wrap.appendChild(chip);
+  });
+}
 
 // ---------- Render ----------
+function setDailyQuote(){
+  // deterministic quote per day
+  const idx = (new Date().getFullYear()*1000 + (new Date().getMonth()+1)*50 + new Date().getDate()) % QUOTES.length;
+  $("qodText").textContent = QUOTES[idx];
+}
+
 function render(){
-  $("currency").value = state.cur;
+  // currency select
+  const curSel=$("currency"); curSel.innerHTML=''; Object.keys(C).forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k+' '+C[k]; curSel.appendChild(o); }); curSel.value=state.cur;
+  // categories select/chips
+  populateCategories(); renderCatChips();
+
   // progress for primary goal
   const saved = totalSaved(); $("goalText").textContent = state.goal?fmt(state.goal):'—';
   const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0; $("bar").style.width = pct+"%";
   checkMilestones(pct);
 
   // history
-  const filt = $("hFilter").value; const now=Date.now(); let items=[...state.hist];
+  const filt = $("hFilter").value || 'all'; const now=Date.now(); let items=[...state.hist];
   if(filt==='week'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 7*24*3600*1000 ); }
   if(filt==='month'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 30*24*3600*1000 ); }
   const ul=$("history"); ul.innerHTML=''; items.slice().reverse().forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${new Date(h.ts).toLocaleString()}</div><div><strong>${fmt(h.amt)}</strong> <small>${h.cat||''}</small></div></div>${h.note?`<small>${h.note}</small>`:''}`; ul.appendChild(li); });
@@ -400,17 +491,26 @@ function render(){
   const lines=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]).map(k=>`${k} — ${fmt(byCat[k])}`); $("whereSaved").value = lines.join("\n");
 
   // other panels
-  drawDebt(); drawFV(); renderMetrics(); renderBoard(); renderBadges();
+  drawDebt(); drawFV(); renderMetrics(); renderBoard(); renderMiniBoard(); renderBadges();
 }
 
 // ---------- Listeners ----------
 document.addEventListener('DOMContentLoaded', function(){
+  // daily quote
+  setDailyQuote();
+  
+  // sound toggle
+  const st=$("soundToggle"); st.checked = !!state.sound; st.addEventListener('change', (e)=>{ state.sound = e.target.checked; setk(K.SOUND, state.sound? '1':'0'); showToast(state.sound? 'Sound on 🔊':'Sound off 🔇'); });
+
   // currency
   $("currency").addEventListener('change', function(e){ state.cur=e.target.value; setk(K.CUR,state.cur); render(); });
 
   // save
   $("save").addEventListener('click', function(){ const el=$("amount"); const raw=el.value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt||amt<=0){ el.focus(); return; } saveInstead(amt); el.value=''; $("note").value=''; });
   document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{ $("amount").value=b.getAttribute('data-amt'); }));
+
+  // categories
+  $("catAdd").addEventListener('click', ()=>{ const name=$("catName").value.trim(); if(!name) return; if(!state.cats.includes(name)){ state.cats.push(name); setk(K.CATS,state.cats); populateCategories(); renderCatChips(); } $("catName").value=''; });
 
   // goals
   $("gAdd").addEventListener('click', upsertGoal);
@@ -432,14 +532,6 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Share (track for badge)
   $("share").addEventListener('click', function(){ const url=location.origin+location.pathname+(state.group?('?group='+encodeURIComponent(state.group)):''); try{ if(navigator.share){ navigator.share({title:'Money Mind',text:'Join my saving challenge!',url}); } else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Copy Link',1200); }); } }catch(_){} finally{ state.sharedOnce=true; setk(K.SHARED,'1'); awardBadges(); } });
-
-  // Competition inputs
-  $("nameIn").addEventListener('input', e=>{ state.profile.name=e.target.value; setk(K.PROFILE,state.profile); renderBoard(); });
-  $("regionIn").addEventListener('change', e=>{ state.profile.region=e.target.value; setk(K.PROFILE,state.profile); renderBoard(); });
-  $("boardMode").addEventListener('change', renderBoard);
-  $("groupCreate").addEventListener('click', ()=>{ const code=Math.random().toString(36).slice(2,8).toUpperCase(); state.group=code; setk(K.GROUP,code); $("groupIn").value=code; renderBoard(); });
-  $("groupJoin").addEventListener('click', ()=>{ const code=$("groupIn").value.trim().toUpperCase(); if(!code) return; state.group=code; setk(K.GROUP,code); renderBoard(); });
-  $("groupShare").addEventListener('click', ()=>{ const url=location.origin+location.pathname+'?group='+(state.group||''); if(!state.group){ alert('Create or enter a group code first.'); return; } try{ if(navigator.share){ navigator.share({title:'Join my Money Mind group', url}); } else { navigator.clipboard.writeText(url); } }catch(_){} });
 
   render();
 });
