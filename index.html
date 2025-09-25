@@ -3,236 +3,115 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Money Mind — Save Instead</title>
+<title>Money Mind — Save Instead (Demo)</title>
 <style>
-  :root{--bg:#f4f6f8;--fg:#0f172a;--muted:#6b7280;--accent:#2563eb;--ok:#16a34a;--warn:#ef4444;--card:#ffffff;--line:#e5e7eb}
+  :root{--bg:#f6f8fb;--fg:#0f172a;--muted:#667085;--accent:#2563eb;--ok:#16a34a;--card:#ffffff;--line:#e5e7eb}
   *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
-  header{padding:12px 16px 0 16px;display:flex;flex-direction:column;gap:8px}
-  .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
-  h1{margin:0;font-size:22px;font-weight:800}
-  .quote-banner{background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:8px 12px;font-size:14px}
-  .quote-banner b{color:#a7f3d0}
-  main{padding:16px;display:grid;grid-template-columns:1fr;gap:16px;max-width:1100px;margin:0 auto}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  header{padding:12px 16px 0 16px}
   .row{display:flex;gap:10px;align-items:center}
   .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  h1{margin:0 0 10px 0;font-size:22px;font-weight:800}
+  .qod{background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:8px 12px;font-size:14px}
+  main{padding:16px;display:grid;grid-template-columns:1fr;gap:14px;max-width:1024px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+  input,select,button{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);padding:10px}
+  button{cursor:pointer} .primary{background:#22c55e;color:#fff;border-color:#22c55e}
+  .chips{display:flex;gap:8px;flex-wrap:wrap} .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;color:#64748b;cursor:pointer}
   .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .metric{background:#fbfbfd;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-  .metric b{display:block;font-size:14px;color:var(--muted)}
-  .metric strong{font-size:18px}
-  input,select,button,textarea{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);padding:10px}
-  button{cursor:pointer} button.primary{background:#22c55e;color:#fff;border-color:#22c55e}
-  button.ghost{background:#fff;color:var(--accent);border-color:var(--accent)}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-  .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--muted);background:#fff}
+  .metric{background:#fafbfd;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .metric b{display:block;font-size:13px;color:var(--muted)} .metric strong{font-size:18px}
   .progress{height:12px;background:#eef2f7;border-radius:12px;overflow:hidden;position:relative}
   .bar{height:100%;background:var(--ok)}
-  .goalwrap{position:relative}
-  .ms{position:absolute;top:0;bottom:0;width:2px;background:rgba(15,23,42,.12)}
-  .ms::after{content:attr(data-p);position:absolute;top:-20px;transform:translateX(-50%);font-size:10px;color:var(--muted)}
-  ul{list-style:none;margin:0;padding:0}
-  li{padding:8px 0;border-bottom:1px solid var(--line)}
-  small{color:var(--muted)} code{color:#155e75}
-  .section-title{font-weight:700;margin:0 0 8px 0}
-  textarea{width:100%;min-height:90px;resize:vertical}
-  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin-right:6px;margin-top:4px}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .badge{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:#fff}
-  .badge i{font-style:normal;font-size:18px}
-  .badge.locked{opacity:.35}
-  .badgegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  /* confetti */
-  .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
-  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.8}}
-  .xbtn{background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px 8px;cursor:pointer;color:#ef4444}
-  /* toast */
+  .ms{position:absolute;top:0;bottom:0;width:2px;background:rgba(15,23,42,.1)}
+  .ms::after{content:attr(data-p);position:absolute;top:-18px;transform:translateX(-50%);font-size:10px;color:#94a3b8}
+  ul{list-style:none;margin:0;padding:0} li{padding:8px 0;border-bottom:1px solid var(--line)}
+  /* toast & confetti */
   .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:99999}
   .toast.show{opacity:1;transform:translateY(0)}
-  @media (max-width:900px){.metrics{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}.badgegrid{grid-template-columns:1fr 1fr}}
+  .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
 </style>
 </head>
 <body>
   <header>
-    <div class="header-row">
-      <h1>💡 Money Mind</h1>
+    <div class="between">
+      <h1>💡 Money Mind — Save Instead</h1>
       <div class="row">
-        <label for="currency"><small>Currency</small></label>
+        <label><small>Currency</small></label>
         <select id="currency"></select>
         <label class="row" style="gap:6px"><input type="checkbox" id="soundToggle"> <small>Sound</small></label>
       </div>
     </div>
-    <div id="dailyQuote" class="quote-banner">💬 <b>Quote of the day:</b> <span id="qodText">Small wins add up to big success.</span></div>
+    <div class="qod">💬 <b>Quote of the day:</b> <span id="qodText">Small wins add up to big success.</span></div>
   </header>
 
   <main>
-    <!-- Capture & Metrics -->
+    <!-- Capture & metrics -->
     <section class="card">
       <div class="metrics">
         <div class="metric"><b>This month</b><strong id="mThis">$0.00</strong></div>
         <div class="metric"><b>Streak</b><strong id="mStreak">0 days</strong></div>
         <div class="metric"><b>Lifetime</b><strong id="mLife">$0.00</strong></div>
-        <div class="metric"><b>Total Saved (all time)</b><strong id="mTotal">$0.00</strong></div>
+        <div class="metric"><b>Total Saved</b><strong id="mTotal">$0.00</strong></div>
       </div>
-
-      <div class="row" style="margin-top:12px">
-        <input id="amount" type="text" placeholder="Almost spent… e.g. 12.00" style="flex:1">
+      <div class="row" style="margin-top:10px">
+        <input id="amount" placeholder="Almost spent… e.g. 12.00" style="flex:1">
         <select id="category"></select>
         <input id="note" placeholder="Notes (optional)" style="flex:1">
         <button id="save" class="primary">Save Instead</button>
       </div>
-      <div class="chips">
+      <div class="chips" style="margin-top:6px">
         <div class="chip" data-amt="5">$5</div>
         <div class="chip" data-amt="10">$10</div>
         <div class="chip" data-amt="20">$20</div>
       </div>
     </section>
 
-    <!-- Suggestions / Quotes -->
+    <!-- Suggestions / quote after save -->
     <section class="card">
-      <h3 class="section-title">Suggestions</h3>
+      <h3 style="margin:0 0 6px 0">Suggestions</h3>
       <div id="suggestions">Make a few saves and I’ll suggest something useful you can do with that money.</div>
       <div id="quote" style="margin-top:8px;color:#065f46;font-weight:600"></div>
     </section>
 
-    <!-- Mini Leaderboard (demo-friendly) -->
+    <!-- Mini Leaderboard (guaranteed peers) -->
     <section class="card">
-      <h3 class="section-title">Mini Leaderboard (Demo)</h3>
+      <h3 style="margin:0 0 6px 0">Mini Leaderboard (Demo)</h3>
       <ul id="miniBoard"></ul>
-   function ensureMiniBoard() {
-  const ul = $("miniBoard");
-  if (!ul) return;
-  // If mini board has no items, inject a safe fallback set
-  if (!ul.children.length) {
-    const fallback = [
-      { name: "Alex T.", score: 240 },
-      { name: "Jordan S.", score: 210 },
-      { name: (state.profile.name || "You"), score: computeScore() || 180 }
-    ];
-    ul.innerHTML = "";
-    fallback.forEach((p, i) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<div class="between"><div>${i + 1}. <strong>${p.name}</strong>${p.name === "You" ? " <small>(you)</small>" : ""}</div><div>${p.score}</div></div>`;
-      ul.appendChild(li);
-    });
-  }
-} 
     </section>
 
-    <!-- Categories (user-generated) -->
+    <!-- Goals / progress -->
     <section class="card">
-      <h3 class="section-title">Categories</h3>
+      <h3 style="margin:0 0 6px 0">Savings Goal</h3>
       <div class="row">
-        <input id="catName" placeholder="Add a category (e.g., Books)" style="flex:1">
-        <button id="catAdd" class="ghost">Add</button>
+        <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 50" style="width:180px">
+        <button id="gSet">Set Goal</button>
       </div>
-      <div id="catList" class="chips" style="margin-top:8px"></div>
-      <small class="tip">Tip: These appear in the Save Instead dropdown.</small>
-    </section>
-
-    <!-- Goals -->
-    <section class="card">
-      <h3 class="section-title">Savings Goals (Multiple)</h3>
-      <div class="row">
-        <input id="goalName" placeholder="Goal name" style="flex:1">
-        <input id="goalIn" type="number" min="1" step="1" placeholder="Target (e.g., 200)">
-        <input id="goalAlloc" type="number" min="0" max="100" step="1" placeholder="% alloc (e.g., 40)">
-        <button id="gAdd" class="ghost">Add/Update</button>
-      </div>
-      <div class="goalwrap" style="margin-top:10px">
-        <div class="progress"><div class="bar" id="bar" style="width:0%"></div></div>
+      <div style="margin-top:8px; position:relative">
+        <div class="progress"><div id="bar" class="bar" style="width:0%"></div></div>
         <div class="ms" style="left:25%" data-p="25%"></div>
         <div class="ms" style="left:50%" data-p="50%"></div>
         <div class="ms" style="left:75%" data-p="75%"></div>
         <div class="ms" style="left:100%" data-p="100%"></div>
       </div>
       <div class="between" style="margin-top:6px"><small>Goal</small><small id="goalText">—</small></div>
-      <div id="goalsList" style="margin-top:8px"></div>
     </section>
 
-    <!-- History & CSV -->
+    <!-- Competitions (auto leaderboard) -->
     <section class="card">
-      <div class="between">
-        <h3 class="section-title" style="margin:0">History & CSV</h3>
-        <div class="row">
-          <button id="hExport" class="ghost">Export CSV</button>
-          <select id="hFilter">
-            <option value="all">All</option>
-            <option value="week">Last 7 days</option>
-            <option value="month">Last 30 days</option>
-          </select>
-        </div>
-      </div>
-      <ul id="history" style="margin-top:8px"></ul>
-    </section>
-
-    <!-- Where You Saved & Future Value -->
-    <section class="grid-2">
-      <div class="card">
-        <h3 class="section-title">Where You Saved (This Month)</h3>
-        <textarea id="whereSaved" placeholder="(Placeholder for chart)\nCoffee — $15\nSnacks — $8\n…"></textarea>
-      </div>
-      <div class="card">
-        <h3 class="section-title">Future Value</h3>
-        <div class="row">
-          <small>Years</small><input id="fvYears" type="range" min="0" max="10" step="1" value="1" style="flex:1"><small id="fvYearsLbl">1y</small>
-          <small style="margin-left:12px">Rate %</small><input id="fvRate" type="range" min="0" max="15" step="1" value="4" style="flex:1"><small id="fvRateLbl">4%</small>
-        </div>
-        <textarea id="fvOut" style="margin-top:8px" placeholder="(Projection will appear here)"></textarea>
-      </div>
-    </section>
-
-    <!-- Debt Snowball -->
-    <section class="card">
-      <h3 class="section-title">Debt Snowball</h3>
-      <div class="row">
-        <label class="pill">Strategy <select id="debtStrategy"><option value="avalanche">Avalanche</option><option value="snowball">Snowball</option></select></label>
-        <label class="pill">Alloc % <input id="debtAlloc" type="range" min="0" max="100" step="1" value="40"> <small id="allocLbl">40%</small></label>
-        <input id="debtName" placeholder="Debt (Visa)">
-        <input id="debtBal" type="number" step="0.01" placeholder="Balance">
-        <input id="debtAPR" type="number" step="0.01" placeholder="APR%">
-        <input id="debtMin" type="number" step="0.01" placeholder="Min">
-        <button id="debtAdd" class="ghost">Add</button>
-      </div>
-      <textarea id="debtBox" style="margin-top:8px" placeholder="(Debt plan will display here)"></textarea>
-    </section>
-
-    <!-- Budget Coach -->
-    <section class="card">
-      <h3 class="section-title">Budget Coach</h3>
-      <small>Ask something like: “Can I afford $50 shoes?”</small>
-      <div class="row" style="margin-top:8px">
-        <input id="question" placeholder="Ask the coach…" style="flex:1">
-        <button id="ask" class="ghost">Ask Coach</button>
-      </div>
-      <div id="coachText" class="pill" style="margin-top:8px"></div>
-    </section>
-
-    <!-- Streak & Badges -->
-    <section class="card">
-      <h3 class="section-title">Streak & Badges</h3>
-      <div class="between"><div><strong>Current Streak</strong></div><div><strong id="streakCount">0</strong> day(s)</div></div>
-      <div class="sub" id="lastSaveText" style="margin-top:4px">Last save: —</div>
-      <div id="badges" class="badgegrid" style="margin-top:8px"></div>
-    </section>
-
-    <!-- Competitions -->
-    <section class="card">
-      <h3 class="section-title">Competitions</h3>
+      <h3 style="margin:0 0 6px 0">Competitions</h3>
       <div class="row">
         <input id="nameIn" placeholder="Your name" style="flex:1">
         <select id="regionIn">
-          <option value="NA">North America</option><option value="EU">Europe</option><option value="AS">Asia</option>
-          <option value="SA">South America</option><option value="AF">Africa</option><option value="OC">Oceania</option>
+          <option value="NA">North America</option><option value="EU">Europe</option>
+          <option value="AS">Asia</option><option value="SA">South America</option>
+          <option value="AF">Africa</option><option value="OC">Oceania</option>
+        </select>
+        <select id="boardMode" style="margin-left:auto">
+          <option value="friends">Friends</option><option value="region" selected>Region</option><option value="world">World</option>
         </select>
       </div>
-      <div class="row" style="margin-top:8px">
-        <input id="groupIn" placeholder="Group code (friends)" style="flex:1">
-        <button id="groupCreate">Create</button>
-        <button id="groupJoin">Join</button>
-        <button id="groupShare">Share</button>
-        <select id="boardMode" style="margin-left:auto"><option value="friends">Friends</option><option value="region">Region</option><option value="world">World</option></select>
-      </div>
-      <small id="boardTip" class="pill">Create or join a group to see your friends leaderboard.</small>
+      <small id="boardTip" style="display:block;margin-top:6px;color:#667085">Showing top savers in your region.</small>
       <ul id="board" style="margin-top:8px"></ul>
     </section>
   </main>
@@ -240,318 +119,165 @@
   <div id="toast" class="toast"></div>
 
 <script>
-// ---------- Helpers & State ----------
-const $ = (id) => document.getElementById(id);
-const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-const K = { CUR:'mm_cur', GOAL:'mm_goal', HIST:'mm_hist', DEBTS:'mm_debts', STRAT:'mm_debt_strat', STREAK:'mm_streak', LAST:'mm_last_save', BADGES:'mm_badges', PROFILE:'mm_profile', GROUP:'mm_group', GOALS:'mm_goals', SHARED:'mm_shared', MILE:'mm_goal_milestone', CATS:'mm_cats', SOUND:'mm_sound' };
-const DEFAULT_CATS = ['Coffee','Snacks','Clothes','Gadgets','Rides'];
-const QUOTES = [
-  'Small wins add up to big success.',
-  'You just paid your future self.',
-  'Skip a treat, grow a streak.',
-  'Save today, thank yourself tomorrow.',
-  'Consistency beats intensity.',
-  'Every $5 counts — keep going!',
-  'One less impulse, one step closer.',
-  'Tiny habits → huge outcomes.',
-  'Great job — keep the momentum!',
-  'Invest in your goals, not impulses.'
+/* ---------- State & helpers ---------- */
+const $=id=>document.getElementById(id);
+const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
+const QUOTES=[
+  'Small wins add up to big success.','You just paid your future self.','Skip a treat, grow a streak.',
+  'Save today, thank yourself tomorrow.','Consistency beats intensity.','Every $5 counts — keep going!',
+  'One less impulse, one step closer.','Tiny habits → huge outcomes.','Great job — keep the momentum!','Invest in your goals, not impulses.'
 ];
-const state = {
-  cur: localStorage.getItem(K.CUR) || 'USD',
-  goal: +(localStorage.getItem(K.GOAL) || 200),
-  hist: JSON.parse(localStorage.getItem(K.HIST) || '[]'), // {ts,amt,cat,note}
-  debts: JSON.parse(localStorage.getItem(K.DEBTS) || '[]'),
-  debtStrat: localStorage.getItem(K.STRAT) || 'avalanche',
-  streak: +(localStorage.getItem(K.STREAK) || 0),
-  lastSave: localStorage.getItem(K.LAST) || null,
-  profile: JSON.parse(localStorage.getItem(K.PROFILE) || '{"name":"","region":"NA"}'),
-  group: localStorage.getItem(K.GROUP) || (new URLSearchParams(location.search).get('group') || ''),
-  goals: JSON.parse(localStorage.getItem(K.GOALS) || '[]'), // [{name,target,alloc}]
-  badges: JSON.parse(localStorage.getItem(K.BADGES) || '[]'), // [{id,label,icon,ts}]
-  sharedOnce: localStorage.getItem(K.SHARED) === '1',
-  milestone: +(localStorage.getItem(K.MILE) || 0),
-  cats: JSON.parse(localStorage.getItem(K.CATS) || 'null') || DEFAULT_CATS.slice(),
-  sound: localStorage.getItem(K.SOUND) !== '0' // default on
+const state={
+  cur: localStorage.getItem('mm_cur')||'USD',
+  goal:+(localStorage.getItem('mm_goal')||50),
+  hist: JSON.parse(localStorage.getItem('mm_hist')||'[]'), // {ts,amt,cat,note}
+  streak:+(localStorage.getItem('mm_streak')||0),
+  last: localStorage.getItem('mm_last')||null,
+  cats: JSON.parse(localStorage.getItem('mm_cats')||'null') || ['Coffee','Snacks','Clothes','Gadgets','Rides'],
+  sound: localStorage.getItem('mm_sound')!=='0',
+  name: (JSON.parse(localStorage.getItem('mm_profile')||'{"name":""}').name)||'You',
+  milestone:+(localStorage.getItem('mm_milestone')||0)
 };
+function setk(k,v){ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v));}
+function fmt(n){ return C[state.cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function nowISO(){return new Date().toISOString();}
+function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+function thisMonth(ts){const d=new Date(ts),n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();}
+function totalSaved(){return state.hist.reduce((s,h)=>s+Number(h.amt||0),0);}
+function monthSaved(){return state.hist.filter(h=>thisMonth(h.ts)).reduce((s,h)=>s+Number(h.amt||0),0);}
 
-function setk(k,v){ localStorage.setItem(k, typeof v==='string'? v : JSON.stringify(v)); }
-function fmt(n){ return C[state.cur] + (Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})); }
-function nowISO(){ return new Date().toISOString(); }
-function ymd(d){ const x = new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
-function thisMonth(ts){ const d=new Date(ts); const n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
-function hash(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
-function prng(seed){ let x = seed>>>0; return ()=> (x = (x*1664525 + 1013904223)>>>0) / 0xFFFFFFFF; }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-// ---------- Audio (ding) ----------
+/* ---------- Audio ding ---------- */
 let audioCtx;
 function playDing(){
   if(!state.sound) return;
   try{
-    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type='sine'; o.frequency.value=880; // A5
-    g.gain.value=0.0001; g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.25);
+    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.value=0.0001; g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.25);
     o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.28);
   }catch(e){}
 }
 
-// ---------- Toast ----------
+/* ---------- Toast & confetti ---------- */
 let toastTimer=null;
-function showToast(msg){
-  const t=$("toast"); t.textContent=msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 1800);
-}
+function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
+function confetti(count=120){const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];for(let i=0;i<count;i++){const el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.transform='rotate('+(Math.random()*360)+'deg)';el.style.animationDelay=(Math.random()*0.3)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
 
-// ---------- Core Actions ----------
+/* ---------- Save flow ---------- */
 function saveInstead(amt){
-  amt = Number(amt);
-  if(!amt || amt<=0) return;
-  // get selected cat; ensure exists
-  let catSel = $("category").value;
-  if(!state.cats.includes(catSel)) { state.cats.push(catSel); setk(K.CATS,state.cats); populateCategories(); }
-  const rec = { ts: nowISO(), amt, cat: catSel, note: $("note").value.trim() };
-  state.hist.push(rec); setk(K.HIST, state.hist);
-  updateStreakOnSave();
-  suggest(rec);
-  // inspirational quote + sound + toast
-  $("quote").textContent = '💡 ' + pick(QUOTES);
-  playDing();
-  showToast(`Saved ${fmt(amt)} instead 🎉`);
-  awardBadges();
+  amt=Number(amt); if(!amt||amt<=0) return;
+  const rec={ts:nowISO(), amt, cat:$('category').value, note:$('note').value.trim()};
+  state.hist.push(rec); setk('mm_hist',state.hist);
+  // streak
+  const today=ymd(new Date()); const last=state.last?ymd(state.last):null;
+  if(last===today){} else if(last&&ymd(new Date(Date.now()-86400000))===last){state.streak=(state.streak||0)+1;} else {state.streak=1;}
+  state.last=new Date().toISOString(); setk('mm_streak',state.streak); setk('mm_last',state.last);
+  // UI goodies
+  $('quote').textContent='💡 '+QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  playDing(); showToast(`Saved ${fmt(amt)} instead 🎉`);
   render();
 }
-function upsertGoal(){
-  const name = $("goalName").value.trim(); const target = +($("goalIn").value||0); const alloc = +($("goalAlloc").value||0);
-  if(!name || !target) return;
-  const i = state.goals.findIndex(g=>g.name.toLowerCase()===name.toLowerCase());
-  if(i>=0) state.goals[i] = {name,target,alloc}; else state.goals.push({name,target,alloc});
-  setk(K.GOALS,state.goals); state.goal = target; setk(K.GOAL,target);
-  awardBadges();
-  render();
-}
-function exportCSV(){
-  const rows = [["date","amount","category","note"]].concat(state.hist.map(h=>[h.ts,h.amt,h.cat||'',(h.note||'').replace(/,/g,';')]));
-  const csv = rows.map(r=>r.join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='money-mind-history.csv'; a.click(); URL.revokeObjectURL(url);
-}
-
-// ---------- Suggestions ----------
-function suggest(rec){
-  const saved = totalSaved();
-  const tip = saved >= 100 ? `Nice! You’ve saved ${fmt(saved)}. Consider moving $${Math.max(10,Math.round(saved*0.1))} to a high‑yield account.` : `Great job! Keep going — small wins add up.`;
-  $("suggestions").textContent = tip;
-}
-
-// ---------- Streak ----------
-function updateStreakOnSave(){
-  const today = ymd(new Date());
-  const last = state.lastSave ? ymd(state.lastSave) : null;
-  if(last === today){ /* same day */ }
-  else if(last && isYesterday(last)) state.streak = (state.streak||0) + 1; else state.streak = 1;
-  state.lastSave = new Date().toISOString(); setk(K.STREAK,state.streak); setk(K.LAST,state.lastSave);
-}
-function isYesterday(lastYmd){ const y2=new Date(); y2.setDate(y2.getDate()-1); return lastYmd===ymd(y2); }
-
-// ---------- Badges ----------
-function haveBadge(id){ return state.badges.some(b=>b.id===id); }
-function giveBadge(id,label,icon){ if(haveBadge(id)) return; state.badges.push({id,label,icon,ts:nowISO()}); setk(K.BADGES,state.badges); }
-function awardBadges(){
-  const saved = totalSaved();
-  const month = monthSaved();
-  const cats = new Set(state.hist.map(h=>h.cat||'Other'));
-  if(state.hist.length>=1) giveBadge('first','First Save','🎉');
-  if(saved>=100) giveBadge('100','Saved $100','🏅');
-  if(saved>=500) giveBadge('500','Saved $500','💰');
-  if(saved>=1000) giveBadge('1000','Saved $1000','💎');
-  if(state.streak>=3) giveBadge('streak3','3‑Day Streak','🔥');
-  if(state.streak>=7) giveBadge('streak7','7‑Day Streak','🌟');
-  if(month>=100) giveBadge('month100','$100 This Month','📅');
-  if(cats.size>=5) giveBadge('diverse','Category Explorer (5+)','🧭');
-  if(state.sharedOnce) giveBadge('share','Shared Challenge','🔗');
-  renderBadges();
-}
-function renderBadges(){
-  const slot = $("badges"); slot.innerHTML='';
-  const all = [
-    {id:'first', label:'First Save', icon:'🎉'},
-    {id:'100', label:'Saved $100', icon:'🏅'},
-    {id:'500', label:'Saved $500', icon:'💰'},
-    {id:'1000', label:'Saved $1000', icon:'💎'},
-    {id:'streak3', label:'3‑Day Streak', icon:'🔥'},
-    {id:'streak7', label:'7‑Day Streak', icon:'🌟'},
-    {id:'month100', label:'$100 This Month', icon:'📅'},
-    {id:'diverse', label:'Category Explorer (5+)', icon:'🧭'},
-    {id:'share', label:'Shared Challenge', icon:'🔗'}
-  ];
-  all.forEach(b=>{
-    const earned = haveBadge(b.id);
-    const div = document.createElement('div');
-    div.className = 'badge' + (earned?'':' locked');
-    div.innerHTML = `<i>${b.icon}</i><span>${b.label}</span>`;
-    slot.appendChild(div);
-  });
-}
-
-// ---------- Confetti ----------
-function confetti(count=120, duration=1600){
-  const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];
-  for(let i=0;i<count;i++){
-    const el=document.createElement('div');
-    el.className='confetti';
-    el.style.left = Math.random()*100+'vw';
-    el.style.background = colors[Math.floor(Math.random()*colors.length)];
-    el.style.transform = 'rotate('+(Math.random()*360)+'deg)';
-    el.style.animationDelay = (Math.random()*0.3)+'s';
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), duration+700);
-  }
+function setGoal(){
+  const g=+($('goalIn').value||0); if(!g||g<=0) return;
+  state.goal=g; setk('mm_goal',g); render();
 }
 function checkMilestones(pct){
   const marks=[25,50,75,100];
-  for(const m of marks){
-    if(pct>=m && state.milestone < m){
-      state.milestone = m; setk(K.MILE,String(m));
-      confetti();
-      showToast(`${m}% goal milestone reached 🎯`);
-      break;
-    }
-  }
+  for(const m of marks){ if(pct>=m && state.milestone<m){ state.milestone=m; setk('mm_milestone',m); confetti(); showToast(`${m}% goal milestone 🎯`); break; } }
 }
 
-// ---------- Debt ----------
-function drawDebt(){
-  const strategy = $("debtStrategy").value; const alloc = +$("debtAlloc").value || 0; $("allocLbl").textContent = alloc+"%";
-  const out = state.debts.slice();
-  if(strategy==='snowball') out.sort((a,b)=>a.balance-b.balance); else out.sort((a,b)=>b.apr-a.apr);
-  const lines = out.map((d,i)=> `${i+1}. ${d.name} — Bal ${fmt(d.balance||0)}, APR ${d.apr||0}%${d.min?`, Min ${fmt(d.min)}`:''}`);
-  $("debtBox").value = lines.join("\n");
-}
+/* ---------- Leaderboards ---------- */
+function computeScore(){ return Math.round(totalSaved()+state.streak*5); }
+function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);} return h>>>0;}
+function prng(seed){let x=seed>>>0; return ()=> (x=(x*1664525+1013904223)>>>0)/0xFFFFFFFF;}
+function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)]+' '+String.fromCharCode(65+Math.floor(rnd()*26))+'.'); } return out; }
 
-// ---------- Future Value ----------
-function drawFV(){
-  const years = +($("fvYears").value||0); const rate = (+($("fvRate").value||0))/100;
-  $("fvYearsLbl").textContent = years+"y"; $("fvRateLbl").textContent = Math.round(rate*100)+"%";
-  const principal = totalSaved(); const fv = principal * Math.pow(1+rate, years);
-  $("fvOut").value = `Projected value of your saved money in ${years} year(s) at ${(rate*100).toFixed(1)}%: ${fmt(fv)}`;
+function renderBoard(){
+  const mode=$('boardMode').value;
+  const ul=$('board'); ul.innerHTML='';
+  const me={name: state.name||'You', score: computeScore(), me:true};
+  const seedStr= mode+':' + ($('regionIn').value||'NA');
+  const names=sampleNames(hash(seedStr)+12345);
+  const rnd=prng(hash(seedStr));
+  const peers=names.map(n=>({name:n, score: Math.round(rnd()*400+50)}));
+  const all=[me].concat(peers).sort((a,b)=>b.score-a.score).slice(0,8);
+  all.forEach((p,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.me?' <small>(you)</small>':''}</div><div>${p.score}</div></div>`;
+    ul.appendChild(li);
+  });
+  $('boardTip').textContent = mode==='region' ? 'Showing top savers in your region.' :
+                              mode==='world'  ? 'Global leaderboard preview.' :
+                                                'Friends leaderboard (demo).';
 }
-
-// ---------- Derived & Metrics ----------
-function totalSaved(){ return state.hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
-function monthSaved(){ return state.hist.filter(h=>thisMonth(h.ts)).reduce((s,h)=>s + Number(h.amt||0), 0); }
-function renderMetrics(){
-  $("mThis").textContent = fmt(monthSaved());
-  $("mStreak").textContent = (state.streak||0) + ' days';
-  $("mLife").textContent = fmt(totalSaved());
-  $("mTotal").textContent = fmt(totalSaved());
-}
-
-// ---------- Leaderboards ----------
-function computeScore(){ return Math.round(totalSaved() + state.streak*5); }
-function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)] + ' ' + String.fromCharCode(65+Math.floor(rnd()*26)) + '.'); } return out; }
-function samplePeers(mode){ let seedStr = mode==='friends' && state.group ? 'G:'+state.group : mode+':'+(state.profile.region||'NA'); const rnd=prng(hash(seedStr)); const names=sampleNames(hash(seedStr)+12345); return names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); }
-function renderBoard(){ const mode=$("boardMode").value; const ul=$("board"); ul.innerHTML=''; const mine={name:state.profile.name||'You',score:computeScore(),me:true}; const peers=samplePeers(mode); const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,10); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); }); const tip=$("boardTip"); if(mode==='friends'&&!state.group){ tip.textContent='Create or join a group to compete with friends.';} else if(mode==='friends'&&state.group){ tip.textContent='Group: '+state.group+' — share this with friends.';} else if(mode==='region'){ tip.textContent='Showing top savers in your region.';} else { tip.textContent='Global leaderboard preview.'; } }
 function renderMiniBoard(){
-  const ul=$("miniBoard"); ul.innerHTML='';
-  const mine={name:state.profile.name||'You',score:computeScore(),me:true};
-  const peers=samplePeers('friends').slice(0,3);
-  const all=[mine].concat(peers).sort((a,b)=>b.score-a.score).slice(0,3);
-  all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${i+1}. <strong>${p.name}</strong>${p.me?" <small>(you)</small>":""}</div><div>${p.score}</div></div>`; ul.appendChild(li); });
-}
-
-// ---------- Categories UI ----------
-function populateCategories(){
-  const sel = $("category"); sel.innerHTML='';
-  state.cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
-}
-function renderCatChips(){
-  const wrap=$("catList"); wrap.innerHTML='';
-  state.cats.forEach((c,idx)=>{
-    const chip=document.createElement('span'); chip.className='pill'; chip.textContent=c+' ';
-    const del=document.createElement('button'); del.className='xbtn'; del.textContent='×'; del.title='Remove';
-    del.onclick=()=>{ state.cats.splice(idx,1); if(state.cats.length===0){ state.cats=DEFAULT_CATS.slice(); } setk(K.CATS,state.cats); populateCategories(); renderCatChips(); render(); };
-    chip.appendChild(del); wrap.appendChild(chip);
+  const ul=$('miniBoard'); ul.innerHTML='';
+  const peers=[
+    {name:'Alex T.', score:240},
+    {name:'Jordan S.', score:210},
+    {name: state.name||'You', score: computeScore()||180}
+  ];
+  peers.forEach((p,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.name===(state.name||'You')?' <small>(you)</small>':''}</div><div>${p.score}</div></div>`;
+    ul.appendChild(li);
   });
 }
 
-// ---------- Render ----------
-function setDailyQuote(){
-  // deterministic quote per day
-  const idx = (new Date().getFullYear()*1000 + (new Date().getMonth()+1)*50 + new Date().getDate()) % QUOTES.length;
-  $("qodText").textContent = QUOTES[idx];
-}
-
+/* ---------- Render ---------- */
 function render(){
-  // currency select
-  const curSel=$("currency"); curSel.innerHTML=''; Object.keys(C).forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k+' '+C[k]; curSel.appendChild(o); }); curSel.value=state.cur;
-  // categories select/chips
-  populateCategories(); renderCatChips();
-
-  // progress for primary goal
-  const saved = totalSaved(); $("goalText").textContent = state.goal?fmt(state.goal):'—';
-  const pct = state.goal ? Math.max(0, Math.min(100, Math.round((saved/state.goal)*100))) : 0; $("bar").style.width = pct+"%";
-  checkMilestones(pct);
-
-  // history
-  const filt = $("hFilter").value || 'all'; const now=Date.now(); let items=[...state.hist];
-  if(filt==='week'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 7*24*3600*1000 ); }
-  if(filt==='month'){ items = items.filter(h=> now - new Date(h.ts).getTime() <= 30*24*3600*1000 ); }
-  const ul=$("history"); ul.innerHTML=''; items.slice().reverse().forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class=\"between\"><div>${new Date(h.ts).toLocaleString()}</div><div><strong>${fmt(h.amt)}</strong> <small>${h.cat||''}</small></div></div>${h.note?`<small>${h.note}</small>`:''}`; ul.appendChild(li); });
-
-  // goals list
-  const gl=$("goalsList"); gl.innerHTML=''; state.goals.forEach(g=>{ const span=document.createElement('span'); span.className='pill'; span.textContent=`${g.name}: ${fmt(g.target)} • ${g.alloc||0}%`; gl.appendChild(span); });
-
-  // where saved (simple breakdown)
-  const byCat = {}; state.hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ byCat[h.cat||'Other']=(byCat[h.cat||'Other']||0)+Number(h.amt||0); });
-  const lines=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]).map(k=>`${k} — ${fmt(byCat[k])}`); $("whereSaved").value = lines.join("\n");
-
-  // other panels
-  drawDebt(); drawFV(); renderMetrics(); renderBoard(); renderMiniBoard(); renderBadges();
-}
-
-// ---------- Listeners ----------
-document.addEventListener('DOMContentLoaded', function(){
-  // daily quote
-  setDailyQuote();
-  
-  // sound toggle
-  const st=$("soundToggle"); st.checked = !!state.sound; st.addEventListener('change', (e)=>{ state.sound = e.target.checked; setk(K.SOUND, state.sound? '1':'0'); showToast(state.sound? 'Sound on 🔊':'Sound off 🔇'); });
-
   // currency
-  $("currency").addEventListener('change', function(e){ state.cur=e.target.value; setk(K.CUR,state.cur); render(); });
-
-  // save
-  $("save").addEventListener('click', function(){ const el=$("amount"); const raw=el.value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt||amt<=0){ el.focus(); return; } saveInstead(amt); el.value=''; $("note").value=''; });
-  document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{ $("amount").value=b.getAttribute('data-amt'); }));
+  const curSel=$('currency'); curSel.innerHTML=''; Object.keys(C).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k+' '+C[k];curSel.appendChild(o);}); curSel.value=state.cur;
 
   // categories
-  $("catAdd").addEventListener('click', ()=>{ const name=$("catName").value.trim(); if(!name) return; if(!state.cats.includes(name)){ state.cats.push(name); setk(K.CATS,state.cats); populateCategories(); renderCatChips(); } $("catName").value=''; });
+  const sel=$('category'); sel.innerHTML=''; state.cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
 
-  // goals
-  $("gAdd").addEventListener('click', upsertGoal);
+  // metrics
+  $('mThis').textContent=fmt(monthSaved());
+  $('mStreak').textContent=(state.streak||0)+' days';
+  $('mLife').textContent=fmt(totalSaved());
+  $('mTotal').textContent=fmt(totalSaved());
 
-  // export
-  $("hExport").addEventListener('click', exportCSV);
-  $("hFilter").addEventListener('change', ()=>render());
+  // goal bar
+  $('goalText').textContent = state.goal ? fmt(state.goal) : '—';
+  const pct = state.goal ? Math.max(0,Math.min(100,Math.round(totalSaved()/state.goal*100))) : 0;
+  $('bar').style.width = pct+'%'; checkMilestones(pct);
 
-  // debt
-  $("debtAdd").addEventListener('click', function(){ const d={ name:$("debtName").value.trim(), balance:+$("debtBal").value||0, apr:+$("debtAPR").value||0, min:+$("debtMin").value||0 }; if(!d.name||!d.balance) return; state.debts.push(d); setk(K.DEBTS,state.debts); $("debtName").value=$("debtBal").value=$("debtAPR").value=$("debtMin").value=''; drawDebt(); });
-  $("debtStrategy").addEventListener('change', drawDebt);
-  $("debtAlloc").addEventListener('input', drawDebt);
+  // mini + main boards
+  renderMiniBoard();
+  renderBoard();
+}
 
-  // FV sliders
-  $("fvYears").addEventListener('input', drawFV); $("fvRate").addEventListener('input', drawFV);
+/* ---------- Init & events ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // QOD
+  const idx=(new Date().getFullYear()*1000+(new Date().getMonth()+1)*50+new Date().getDate())%QUOTES.length;
+  $('qodText').textContent=QUOTES[idx];
 
-  // Coach (local demo)
-  $("ask").addEventListener('click', function(){ const q=$("question").value.trim(); $("ask").disabled=true; $("ask").textContent='…'; setTimeout(()=>{ const tip=q?`Rule of 30 uses: will you use it 30 times?`: 'Try the 24‑hour rule before big buys.'; $("coachText").textContent=tip; $("ask").disabled=false; $("ask").textContent='Ask Coach'; }, 500); });
+  // Sound toggle
+  const st=$('soundToggle'); st.checked=!!state.sound; st.addEventListener('change',e=>{state.sound=e.target.checked; setk('mm_sound',state.sound?'1':'0'); showToast(state.sound?'Sound on 🔊':'Sound off 🔇');});
 
-  // Share (track for badge)
-  $("share").addEventListener('click', function(){ const url=location.origin+location.pathname+(state.group?('?group='+encodeURIComponent(state.group)):''); try{ if(navigator.share){ navigator.share({title:'Money Mind',text:'Join my saving challenge!',url}); } else { navigator.clipboard.writeText(url).then(()=>{ $("share").textContent='Copied!'; setTimeout(()=>$("share").textContent='Copy Link',1200); }); } }catch(_){} finally{ state.sharedOnce=true; setk(K.SHARED,'1'); awardBadges(); } });
+  // Currency change
+  $('currency').addEventListener('change',e=>{state.cur=e.target.value; setk('mm_cur',state.cur); render();});
 
-  render();
+  // Save
+  $('save').addEventListener('click',()=>{
+    const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt||amt<=0){$('amount').focus(); return;}
+    saveInstead(amt); $('amount').value=''; $('note').value='';
+  });
+  document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{$('amount').value=b.getAttribute('data-amt');}));
+
+  // Goal
+  $('gSet').addEventListener('click', setGoal);
+
+  // Name/region/mode changes affect main board
+  $('nameIn').addEventListener('input', e=>{ state.name=e.target.value||'You'; const p=JSON.parse(localStorage.getItem('mm_profile')||'{"name":""}'); p.name=state.name; setk('mm_profile',p); renderBoard(); });
+  $('regionIn').addEventListener('change', renderBoard);
+  $('boardMode').addEventListener('change', renderBoard);
+
+  render(); // first paint (auto-populates both leaderboards)
 });
 </script>
 </body>
