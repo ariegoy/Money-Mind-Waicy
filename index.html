@@ -30,6 +30,7 @@
   .toast.show{opacity:1;transform:translateY(0)}
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
+  .danger{background:#ef4444;color:#fff;border:none}
 </style>
 </head>
 <body>
@@ -46,7 +47,7 @@
   </header>
 
   <main>
-    <!-- Capture & metrics -->
+    <!-- Metrics + Save -->
     <section class="card">
       <div class="metrics">
         <div class="metric"><b>This month</b><strong id="mThis">$0.00</strong></div>
@@ -67,22 +68,22 @@
       </div>
     </section>
 
-    <!-- Suggestions / quote after save -->
+    <!-- Suggestions -->
     <section class="card">
-      <h3 style="margin:0 0 6px 0">Suggestions</h3>
+      <h3>Suggestions</h3>
       <div id="suggestions">Make a few saves and I’ll suggest something useful you can do with that money.</div>
       <div id="quote" style="margin-top:8px;color:#065f46;font-weight:600"></div>
     </section>
 
-    <!-- Mini Leaderboard (guaranteed peers) -->
+    <!-- Mini Leaderboard -->
     <section class="card">
-      <h3 style="margin:0 0 6px 0">Mini Leaderboard (Demo)</h3>
+      <h3>Mini Leaderboard (Demo)</h3>
       <ul id="miniBoard"></ul>
     </section>
 
-    <!-- Goals / progress -->
+    <!-- Goal -->
     <section class="card">
-      <h3 style="margin:0 0 6px 0">Savings Goal</h3>
+      <h3>Savings Goal</h3>
       <div class="row">
         <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 50" style="width:180px">
         <button id="gSet">Set Goal</button>
@@ -97,9 +98,9 @@
       <div class="between" style="margin-top:6px"><small>Goal</small><small id="goalText">—</small></div>
     </section>
 
-    <!-- Competitions (auto leaderboard) -->
+    <!-- Competitions -->
     <section class="card">
-      <h3 style="margin:0 0 6px 0">Competitions</h3>
+      <h3>Competitions</h3>
       <div class="row">
         <input id="nameIn" placeholder="Your name" style="flex:1">
         <select id="regionIn">
@@ -111,14 +112,37 @@
           <option value="friends">Friends</option><option value="region" selected>Region</option><option value="world">World</option>
         </select>
       </div>
-      <small id="boardTip" style="display:block;margin-top:6px;color:#667085">Showing top savers in your region.</small>
+      <small id="boardTip">Showing top savers in your region.</small>
       <ul id="board" style="margin-top:8px"></ul>
+    </section>
+
+    <!-- 🔴 Reset App (right here, under Competitions) -->
+    <section class="card">
+      <h3>Reset App</h3>
+      <button id="resetAll" class="danger">Reset Everything</button>
+      <small style="display:block;margin-top:6px;color:#64748b">Clears all history, goals, streaks, and name.</small>
     </section>
   </main>
 
   <div id="toast" class="toast"></div>
 
 <script>
+// ... [all your existing JS functions: saveInstead, confetti, leaderboards, etc.] ...
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  // reset listener
+  $("resetAll").addEventListener("click", ()=>{
+    if(confirm("Reset all saved data?")){
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
+  // rest of your init code...
+});
+</script>
+</body>
+</html>
 /* ---------- State & helpers ---------- */
 const $=id=>document.getElementById(id);
 const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
