@@ -19,14 +19,13 @@
   .chips{display:flex;gap:8px;flex-wrap:wrap} .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;color:#64748b;cursor:pointer}
   .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .metric{background:#fafbfd;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-  .metric b{display:block;font-size:13px;color:var(--muted)} .metric strong{font-size:18px}
+  .metric b{display:block;font-size:13px;color:#94a3b8} .metric strong{font-size:18px}
   .progress{height:12px;background:#eef2f7;border-radius:12px;overflow:hidden;position:relative}
   .bar{height:100%;background:var(--ok)}
   .ms{position:absolute;top:0;bottom:0;width:2px;background:rgba(15,23,42,.1)}
   .ms::after{content:attr(data-p);position:absolute;top:-18px;transform:translateX(-50%);font-size:10px;color:#94a3b8}
   ul{list-style:none;margin:0;padding:0} li{padding:8px 0;border-bottom:1px solid var(--line)}
-  /* toast & confetti */
-  .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:99999}
+  .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:9999}
   .toast.show{opacity:1;transform:translateY(0)}
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
@@ -116,34 +115,19 @@
       <ul id="board" style="margin-top:8px"></ul>
     </section>
 
-    <!-- 🔴 Reset App (right here, under Competitions) -->
+    <!-- ✅ Reset App -->
     <section class="card">
       <h3>Reset App</h3>
       <button id="resetAll" class="danger">Reset Everything</button>
-      <small style="display:block;margin-top:6px;color:#64748b">Clears all history, goals, streaks, and name.</small>
+      <small style="display:block;margin-top:6px;color:#64748b">
+        Clears all history, goals, streaks, and name.
+      </small>
     </section>
   </main>
 
   <div id="toast" class="toast"></div>
 
 <script>
-// ... [all your existing JS functions: saveInstead, confetti, leaderboards, etc.] ...
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  // reset listener
-  $("resetAll").addEventListener("click", ()=>{
-    if(confirm("Reset all saved data?")){
-      localStorage.clear();
-      location.reload();
-    }
-  });
-
-  // rest of your init code...
-});
-</script>
-</body>
-</html>
-/* ---------- State & helpers ---------- */
 const $=id=>document.getElementById(id);
 const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
 const QUOTES=[
@@ -154,155 +138,31 @@ const QUOTES=[
 const state={
   cur: localStorage.getItem('mm_cur')||'USD',
   goal:+(localStorage.getItem('mm_goal')||50),
-  hist: JSON.parse(localStorage.getItem('mm_hist')||'[]'), // {ts,amt,cat,note}
+  hist: JSON.parse(localStorage.getItem('mm_hist')||'[]'),
   streak:+(localStorage.getItem('mm_streak')||0),
   last: localStorage.getItem('mm_last')||null,
-  cats: JSON.parse(localStorage.getItem('mm_cats')||'null') || ['Coffee','Snacks','Clothes','Gadgets','Rides'],
+  cats:['Coffee','Snacks','Clothes','Gadgets','Rides'],
   sound: localStorage.getItem('mm_sound')!=='0',
-  name: (JSON.parse(localStorage.getItem('mm_profile')||'{"name":""}').name)||'You',
+  name:'You',
   milestone:+(localStorage.getItem('mm_milestone')||0)
 };
-function setk(k,v){ localStorage.setItem(k, typeof v==='string'?v:JSON.stringify(v));}
-function fmt(n){ return C[state.cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function nowISO(){return new Date().toISOString();}
-function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
-function thisMonth(ts){const d=new Date(ts),n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();}
+function setk(k,v){localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));}
+function fmt(n){return C[state.cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function totalSaved(){return state.hist.reduce((s,h)=>s+Number(h.amt||0),0);}
-function monthSaved(){return state.hist.filter(h=>thisMonth(h.ts)).reduce((s,h)=>s+Number(h.amt||0),0);}
-
-/* ---------- Audio ding ---------- */
+function monthSaved(){return state.hist.reduce((s,h)=>s+Number(h.amt||0),0);}
 let audioCtx;
-function playDing(){
-  if(!state.sound) return;
-  try{
-    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
-    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-    o.type='sine'; o.frequency.value=880;
-    g.gain.value=0.0001; g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.25);
-    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.28);
-  }catch(e){}
-}
-
-/* ---------- Toast & confetti ---------- */
+function playDing(){if(!state.sound)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.0001;g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.25);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.28);}catch(e){}}
 let toastTimer=null;
 function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
 function confetti(count=120){const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];for(let i=0;i<count;i++){const el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.transform='rotate('+(Math.random()*360)+'deg)';el.style.animationDelay=(Math.random()*0.3)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
-
-/* ---------- Save flow ---------- */
-function saveInstead(amt){
-  amt=Number(amt); if(!amt||amt<=0) return;
-  const rec={ts:nowISO(), amt, cat:$('category').value, note:$('note').value.trim()};
-  state.hist.push(rec); setk('mm_hist',state.hist);
-  // streak
-  const today=ymd(new Date()); const last=state.last?ymd(state.last):null;
-  if(last===today){} else if(last&&ymd(new Date(Date.now()-86400000))===last){state.streak=(state.streak||0)+1;} else {state.streak=1;}
-  state.last=new Date().toISOString(); setk('mm_streak',state.streak); setk('mm_last',state.last);
-  // UI goodies
-  $('quote').textContent='💡 '+QUOTES[Math.floor(Math.random()*QUOTES.length)];
-  playDing(); showToast(`Saved ${fmt(amt)} instead 🎉`);
-  render();
-}
-function setGoal(){
-  const g=+($('goalIn').value||0); if(!g||g<=0) return;
-  state.goal=g; setk('mm_goal',g); render();
-}
-function checkMilestones(pct){
-  const marks=[25,50,75,100];
-  for(const m of marks){ if(pct>=m && state.milestone<m){ state.milestone=m; setk('mm_milestone',m); confetti(); showToast(`${m}% goal milestone 🎯`); break; } }
-}
-
-/* ---------- Leaderboards ---------- */
-function computeScore(){ return Math.round(totalSaved()+state.streak*5); }
-function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);} return h>>>0;}
-function prng(seed){let x=seed>>>0; return ()=> (x=(x*1664525+1013904223)>>>0)/0xFFFFFFFF;}
-function sampleNames(seed){ const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<6;i++){ out.push(base[Math.floor(rnd()*base.length)]+' '+String.fromCharCode(65+Math.floor(rnd()*26))+'.'); } return out; }
-
-function renderBoard(){
-  const mode=$('boardMode').value;
-  const ul=$('board'); ul.innerHTML='';
-  const me={name: state.name||'You', score: computeScore(), me:true};
-  const seedStr= mode+':' + ($('regionIn').value||'NA');
-  const names=sampleNames(hash(seedStr)+12345);
-  const rnd=prng(hash(seedStr));
-  const peers=names.map(n=>({name:n, score: Math.round(rnd()*400+50)}));
-  const all=[me].concat(peers).sort((a,b)=>b.score-a.score).slice(0,8);
-  all.forEach((p,i)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.me?' <small>(you)</small>':''}</div><div>${p.score}</div></div>`;
-    ul.appendChild(li);
-  });
-  $('boardTip').textContent = mode==='region' ? 'Showing top savers in your region.' :
-                              mode==='world'  ? 'Global leaderboard preview.' :
-                                                'Friends leaderboard (demo).';
-}
-function renderMiniBoard(){
-  const ul=$('miniBoard'); ul.innerHTML='';
-  const peers=[
-    {name:'Alex T.', score:240},
-    {name:'Jordan S.', score:210},
-    {name: state.name||'You', score: computeScore()||180}
-  ];
-  peers.forEach((p,i)=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<div class="between"><div>${i+1}. <strong>${p.name}</strong>${p.name===(state.name||'You')?' <small>(you)</small>':''}</div><div>${p.score}</div></div>`;
-    ul.appendChild(li);
-  });
-}
-
-/* ---------- Render ---------- */
-function render(){
-  // currency
-  const curSel=$('currency'); curSel.innerHTML=''; Object.keys(C).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k+' '+C[k];curSel.appendChild(o);}); curSel.value=state.cur;
-
-  // categories
-  const sel=$('category'); sel.innerHTML=''; state.cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
-
-  // metrics
-  $('mThis').textContent=fmt(monthSaved());
-  $('mStreak').textContent=(state.streak||0)+' days';
-  $('mLife').textContent=fmt(totalSaved());
-  $('mTotal').textContent=fmt(totalSaved());
-
-  // goal bar
-  $('goalText').textContent = state.goal ? fmt(state.goal) : '—';
-  const pct = state.goal ? Math.max(0,Math.min(100,Math.round(totalSaved()/state.goal*100))) : 0;
-  $('bar').style.width = pct+'%'; checkMilestones(pct);
-
-  // mini + main boards
-  renderMiniBoard();
-  renderBoard();
-}
-
-/* ---------- Init & events ---------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  // QOD
-  const idx=(new Date().getFullYear()*1000+(new Date().getMonth()+1)*50+new Date().getDate())%QUOTES.length;
-  $('qodText').textContent=QUOTES[idx];
-
-  // Sound toggle
-  const st=$('soundToggle'); st.checked=!!state.sound; st.addEventListener('change',e=>{state.sound=e.target.checked; setk('mm_sound',state.sound?'1':'0'); showToast(state.sound?'Sound on 🔊':'Sound off 🔇');});
-
-  // Currency change
-  $('currency').addEventListener('change',e=>{state.cur=e.target.value; setk('mm_cur',state.cur); render();});
-
-  // Save
-  $('save').addEventListener('click',()=>{
-    const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt||amt<=0){$('amount').focus(); return;}
-    saveInstead(amt); $('amount').value=''; $('note').value='';
-  });
-  document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{$('amount').value=b.getAttribute('data-amt');}));
-
-  // Goal
-  $('gSet').addEventListener('click', setGoal);
-
-  // Name/region/mode changes affect main board
-  $('nameIn').addEventListener('input', e=>{ state.name=e.target.value||'You'; const p=JSON.parse(localStorage.getItem('mm_profile')||'{"name":""}'); p.name=state.name; setk('mm_profile',p); renderBoard(); });
-  $('regionIn').addEventListener('change', renderBoard);
-  $('boardMode').addEventListener('change', renderBoard);
-
-  render(); // first paint (auto-populates both leaderboards)
-});
+function saveInstead(amt){amt=Number(amt);if(!amt||amt<=0)return;state.hist.push({ts:Date.now(),amt});setk('mm_hist',state.hist);state.streak++;setk('mm_streak',state.streak);$('quote').textContent='💡 '+QUOTES[Math.floor(Math.random()*QUOTES.length)];playDing();showToast(`Saved ${fmt(amt)} instead 🎉`);render();}
+function setGoal(){const g=+($('goalIn').value||0);if(!g||g<=0)return;state.goal=g;setk('mm_goal',g);render();}
+function checkMilestones(pct){[25,50,75,100].forEach(m=>{if(pct>=m&&state.milestone<m){state.milestone=m;setk('mm_milestone',m);confetti();showToast(`${m}% goal milestone 🎯`);}});}
+function computeScore(){return Math.round(totalSaved()+state.streak*5);}
+function renderMiniBoard(){$('miniBoard').innerHTML=`<li>1. Alex T. — 240</li><li>2. Jordan S. — 210</li><li>3. You (you) — ${computeScore()}</li>`;}
+function renderBoard(){$('board').innerHTML=`<li>1. Casey N. — 366</li><li>2. Jamie M. — 318</li><li>3. Riley K. — 287</li><li>4. Jamie A. — 252</li><li>5. Casey L. — 204</li><li>6. Drew H. — 156</li><li>7. You (you) — ${computeScore()}</li>`;}
+function render(){$('mThis').textContent=fmt(monthSaved());$('mStreak').textContent=state.streak+' days';$('mLife').textContent=fmt(totalSaved());$('mTotal').textContent=fmt(totalSaved());$('goalText').textContent=state.goal?fmt(state.goal):'—';const pct=state.goal?Math.min(100,Math.round(totalSaved()/state.goal*100)):0;$('bar').style.width=pct+'%';checkMilestones(pct);renderMiniBoard();renderBoard();}
+document.addEventListener('DOMContentLoaded',()=>{const idx=(new Date().getDate())%QUOTES.length;$('qodText').textContent=QUOTES[idx];$('soundToggle').checked=!!state.sound;$('soundToggle').addEventListener('change',e=>{state.sound=e.target.checked;setk('mm_sound',state.sound?'1':'0');showToast(state.sound?'Sound on 🔊':'Sound off 🔇');});$('save').addEventListener('click',()=>{const raw=$('amount').value.replace(/[^0-9.]/g,'');const amt=parseFloat(raw||'0');if(!amt||amt<=0){$('amount').focus();return;}saveInstead(amt);$('amount').value='';});document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{$('amount').value=b.getAttribute('data-amt');}));$('gSet').addEventListener('click',setGoal);$('resetAll').addEventListener('click',()=>{if(confirm('Reset all saved data?')){localStorage.clear();location.reload();}});render();});
 </script>
 </body>
 </html>
