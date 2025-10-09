@@ -1,168 +1,674 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Money Mind — Save Instead (Demo)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Money Mind 2.0 — Save Instead</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
 <style>
-  :root{--bg:#f6f8fb;--fg:#0f172a;--muted:#667085;--accent:#2563eb;--ok:#16a34a;--card:#ffffff;--line:#e5e7eb}
-  *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--fg)}
-  header{padding:12px 16px 0 16px}
-  .row{display:flex;gap:10px;align-items:center}
-  .between{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  h1{margin:0 0 10px 0;font-size:22px;font-weight:800}
-  .qod{background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:8px 12px;font-size:14px}
-  main{padding:16px;display:grid;grid-template-columns:1fr;gap:14px;max-width:1024px;margin:0 auto}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-  input,select,button{border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);padding:10px}
-  button{cursor:pointer} .primary{background:#22c55e;color:#fff;border-color:#22c55e}
-  .chips{display:flex;gap:8px;flex-wrap:wrap} .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;color:#64748b;cursor:pointer}
-  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .metric{background:#fafbfd;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-  .metric b{display:block;font-size:13px;color:#94a3b8} .metric strong{font-size:18px}
-  .progress{height:12px;background:#eef2f7;border-radius:12px;overflow:hidden;position:relative}
-  .bar{height:100%;background:var(--ok)}
-  .ms{position:absolute;top:0;bottom:0;width:2px;background:rgba(15,23,42,.1)}
-  .ms::after{content:attr(data-p);position:absolute;top:-18px;transform:translateX(-50%);font-size:10px;color:#94a3b8}
-  ul{list-style:none;margin:0;padding:0} li{padding:8px 0;border-bottom:1px solid var(--line)}
-  .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:9999}
+  :root{
+    --bg:#f7fafc; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --primary:#2563eb; --ok:#16a34a; --warn:#ef4444; --accent:#22c55e; --gold:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter",system-ui,ui-sans-serif;background:var(--bg);color:var(--ink)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:100}
+  h1{margin:0;font-size:20px;font-weight:800;display:flex;gap:8px;align-items:center}
+  .brand{display:flex;gap:8px;align-items:center}
+  .brand-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#22c55e)}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  select,input,button,textarea{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink);font-family:inherit}
+  button{cursor:pointer}
+  .primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .warn{background:var(--warn);color:#fff;border-color:var(--warn)}
+  main{display:grid;grid-template-columns:240px 1fr 320px;gap:14px;padding:14px;max-width:1300px;margin:0 auto}
+  aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .left{padding:12px}
+  .right{padding:12px}
+  .panel{padding:12px}
+  .section-title{font-weight:800;margin:0 0 8px 0;display:flex;justify-content:space-between;align-items:center}
+  .muted{color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px dashed var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);cursor:pointer;background:#fff}
+  .row{display:flex;gap:8px;align-items:center}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .metric{background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .metric b{display:block;color:var(--muted);font-size:12px}
+  .metric strong{font-size:18px}
+  .barwrap{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}
+  .bar{height:100%;background:var(--accent)}
+  ul{list-style:none;margin:0;padding:0}
+  li{padding:8px 0;border-bottom:1px solid var(--line)}
+  /* toast & confetti & thinking */
+  .toast{position:fixed;right:16px;bottom:16px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s all ease;z-index:10000}
   .toast.show{opacity:1;transform:translateY(0)}
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
-  .danger{background:#ef4444;color:#fff;border:none}
+  .thinking{display:none;margin:6px 0;padding:6px 10px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}
+  .thinking.show{display:block}
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+  .tab{padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer}
+  .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+  /* welcome modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:10001}
+  .modal{background:#fff;border-radius:16px;padding:18px;max-width:520px;border:1px solid var(--line)}
+  .modal h2{margin:0 0 8px 0}
+  .impact{background:#f0fdf4;border:1px solid #dcfce7;border-radius:12px;padding:8px 10px;margin-top:6px;font-size:14px}
+  /* coach chat */
+  .chat{height:220px;border:1px solid var(--line);border-radius:12px;padding:8px;overflow:auto;background:#fafafa}
+  .msg{margin:6px 0}
+  .me{color:#0ea5e9}
+  .ai{color:#16a34a}
+  /* carousel */
+  .carousel{display:flex;gap:8px;overflow:auto}
+  .card-mini{flex:0 0 220px;background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:10px}
+  /* charts (SVG) */
+  .chart{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+  .caption{font-size:12px;color:var(--muted);margin-top:4px}
 </style>
 </head>
 <body>
-  <header>
-    <div class="between">
-      <h1>💡 Money Mind — Save Instead</h1>
+
+<header>
+  <div class="brand"><div class="brand-icon"></div><h1>Money Mind — Save Instead</h1></div>
+  <div class="top-actions">
+    <label class="row"><small class="muted">Currency</small>
+      <select id="currency"></select>
+    </label>
+    <label class="row" title="Ding sound on save">
+      <input type="checkbox" id="soundToggle"><small class="muted">Sound</small>
+    </label>
+    <button id="resetAll" class="warn">Reset</button>
+  </div>
+</header>
+
+<!-- Welcome Modal -->
+<div id="welcome" class="modal-bg">
+  <div class="modal">
+    <h2>Welcome to Money Mind</h2>
+    <p>Your AI coach for smarter spending — save instead of impulse buying.</p>
+    <ul>
+      <li>🎯 Set a goal and watch progress</li>
+      <li>🤖 AI classifies purchases, scores risk, and suggests what to do instead</li>
+      <li>🏅 Earn badges & levels; compete with friends, region, world</li>
+    </ul>
+    <div class="impact">If 1,000 people saved $10/week → $520,000/year. At 1M users → <b>billions saved</b>.</div>
+    <div class="row" style="margin-top:10px">
+      <input id="welcomeName" placeholder="Your name" style="flex:1">
+      <button id="startApp" class="primary">Start Saving</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- LEFT: Profile / Badges / Challenges / Motivations -->
+  <aside class="left">
+    <h3 class="section-title">Profile</h3>
+    <div class="row" style="gap:10px;flex-wrap:wrap">
+      <div class="metric"><b>Total Saved</b><strong id="mTotal">$0.00</strong></div>
+      <div class="metric"><b>Streak</b><strong id="mStreak">0 days</strong></div>
+      <div class="metric"><b>Level</b><strong id="mLevel">1</strong></div>
+    </div>
+    <div style="margin:10px 0">
+      <div class="barwrap"><div id="levelBar" class="bar" style="width:0%"></div></div>
+      <small class="muted">Progress to next level</small>
+    </div>
+
+    <h3 class="section-title">Badges</h3>
+    <div id="badges" class="chips"></div>
+
+    <h3 class="section-title">Community Challenges</h3>
+    <div class="chips">
+      <span class="chip" data-chal="No Takeout Week">No Takeout Week</span>
+      <span class="chip" data-chal="$20 Green Challenge">$20 Green Challenge</span>
+      <span class="chip" data-chal="Coffee Skip 5x">Coffee Skip 5x</span>
+    </div>
+    <ul id="challengeList"></ul>
+
+    <h3 class="section-title">Motivations</h3>
+    <div class="carousel" id="motivations">
+      <div class="card-mini">🌍 Saving reduces waste and unnecessary shipping.</div>
+      <div class="card-mini">📈 Small wins compound into big results.</div>
+      <div class="card-mini">💤 Peace of mind beats buyer’s remorse.</div>
+      <div class="card-mini">🎯 Purpose beats impulse.</div>
+    </div>
+  </aside>
+
+  <!-- CENTER: Tabs + Save/Insights/Coach/Debt (content comes in Part 2) -->
+  <section class="panel">
+    <div class="tabs">
+      <button class="tab active" data-tab="save">Save</button>
+      <button class="tab" data-tab="insights">Insights</button>
+      <button class="tab" data-tab="coach">AI Coach</button>
+      <button class="tab" data-tab="debt">Debt</button>
+    </div>
+
+    <!-- SAVE TAB -->
+    <div id="tab-save">
+      <h3 class="section-title">Log a Save</h3>
       <div class="row">
-        <label><small>Currency</small></label>
-        <select id="currency"></select>
-        <label class="row" style="gap:6px"><input type="checkbox" id="soundToggle"> <small>Sound</small></label>
+        <input id="amount" placeholder="I skipped... e.g. 12.00" style="width:140px">
+        <select id="category"></select>
+        <input id="note" placeholder="Why I skipped (optional)" style="flex:1">
+        <button id="save" class="ok">Save Instead</button>
+      </div>
+
+      <div class="chips" style="margin:10px 0">
+        <span class="chip" data-amt="5">$5</span><span class="chip" data-amt="10">$10</span><span class="chip" data-amt="15">$15</span>
+        <span class="chip" data-amt="20">$20</span><span class="chip" data-amt="25">$25</span><span class="chip" data-amt="30">$30</span>
+        <span class="chip" data-cat="Coffee">Coffee</span><span class="chip" data-cat="Snacks">Snacks</span>
+        <span class="chip" data-cat="Clothes">Clothes</span><span class="chip" data-cat="Gadgets">Gadgets</span>
+        <span class="chip" data-cat="Rides">Rides</span><span class="chip" data-cat="Other">Other</span>
+      </div>
+
+      <div class="row" style="gap:16px;align-items:flex-start;margin-top:8px">
+        <div class="col" style="flex:1">
+          <div class="panel">
+            <div class="row" style="justify-content:space-between">
+              <div>
+                <div class="muted">Goal</div>
+                <div class="row">
+                  <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 100" style="width:140px">
+                  <button id="gSet">Set</button>
+                </div>
+              </div>
+              <div class="metric"><b>Progress</b><strong id="goalPct">0%</strong></div>
+            </div>
+            <div style="margin-top:8px">
+              <div class="barwrap"><div id="goalBar" class="bar" style="width:0%"></div></div>
+              <small id="goalText" class="muted">No goal set</small>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">AI Insights <small id="aiExplain" class="muted"></small></div>
+            <div id="thinking" class="thinking">🤖 AI thinking… classifying & scoring risk</div>
+            <div id="aiPanel">
+              <div><b>Detected</b>: <span id="aiDetected" class="muted">—</span></div>
+              <div><b>Category</b>: <span id="aiCategory" class="muted">—</span></div>
+              <div><b>Risk</b>: <span id="aiRisk" class="muted">—</span></div>
+              <div style="margin-top:6px"><b>Suggestion</b>: <span id="aiSuggest" class="muted">—</span></div>
+              <div style="margin-top:6px"><b>What to do with it</b>: <span id="whatDo" class="muted">—</span></div>
+              <div style="margin-top:6px"><b>Impact</b>: <span id="impact" class="muted">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="flex:1">
+          <div class="section-title">History</div>
+          <ul id="history"></ul>
+        </div>
       </div>
     </div>
-    <div class="qod">💬 <b>Quote of the day:</b> <span id="qodText">Small wins add up to big success.</span></div>
-  </header>
 
-  <main>
-    <!-- Metrics + Save -->
-    <section class="card">
-      <div class="metrics">
-        <div class="metric"><b>This month</b><strong id="mThis">$0.00</strong></div>
-        <div class="metric"><b>Streak</b><strong id="mStreak">0 days</strong></div>
-        <div class="metric"><b>Lifetime</b><strong id="mLife">$0.00</strong></div>
-        <div class="metric"><b>Total Saved</b><strong id="mTotal">$0.00</strong></div>
+    <!-- INSIGHTS TAB (charts) -->
+    <div id="tab-insights" class="hidden">
+      <h3 class="section-title">Analysis of Your Saving</h3>
+      <div class="row" style="gap:12px;flex-wrap:wrap">
+        <div class="chart" style="flex:1;min-width:260px">
+          <svg id="barChart" width="100%" height="180"></svg>
+          <div class="caption">$ Saved by Category (this month)</div>
+        </div>
+        <div class="chart" style="flex:1;min-width:260px">
+          <svg id="pieChart" width="100%" height="180"></svg>
+          <div class="caption">Category Distribution</div>
+        </div>
       </div>
       <div class="row" style="margin-top:10px">
-        <input id="amount" placeholder="Almost spent… e.g. 12.00" style="flex:1">
-        <select id="category"></select>
-        <input id="note" placeholder="Notes (optional)" style="flex:1">
-        <button id="save" class="primary">Save Instead</button>
+        <div class="metric"><b>Best Day</b><strong id="bestDay">—</strong></div>
+        <div class="metric"><b>Top Category</b><strong id="topCat">—</strong></div>
+        <div class="metric"><b>Weekly Pace</b><strong id="weeklyPace">$0.00</strong></div>
       </div>
-      <div class="chips" style="margin-top:6px">
-        <div class="chip" data-amt="5">$5</div>
-        <div class="chip" data-amt="10">$10</div>
-        <div class="chip" data-amt="20">$20</div>
+    </div>
+
+    <!-- COACH TAB (chat + weekly summary) -->
+    <div id="tab-coach" class="hidden">
+      <h3 class="section-title">Personal AI Coach</h3>
+      <div class="chat" id="chat"></div>
+      <div class="row" style="margin-top:6px">
+        <input id="coachQ" placeholder="Ask: How am I doing this week?" style="flex:1">
+        <button id="askCoach" class="primary">Ask</button>
       </div>
-    </section>
+      <div class="panel" style="margin-top:10px">
+        <div class="section-title">Weekly Summary</div>
+        <div id="weeklySummary" class="muted">Next summary: —</div>
+      </div>
+    </div>
 
-    <!-- Suggestions -->
-    <section class="card">
-      <h3>Suggestions</h3>
-      <div id="suggestions">Make a few saves and I’ll suggest something useful you can do with that money.</div>
-      <div id="quote" style="margin-top:8px;color:#065f46;font-weight:600"></div>
-    </section>
-
-    <!-- Mini Leaderboard -->
-    <section class="card">
-      <h3>Mini Leaderboard (Demo)</h3>
-      <ul id="miniBoard"></ul>
-    </section>
-
-    <!-- Goal -->
-    <section class="card">
-      <h3>Savings Goal</h3>
+    <!-- DEBT TAB -->
+    <div id="tab-debt" class="hidden">
+      <h3 class="section-title">Debt Helper</h3>
       <div class="row">
-        <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 50" style="width:180px">
-        <button id="gSet">Set Goal</button>
+        <input id="debtBal" type="number" placeholder="Balance e.g. 500" style="width:160px">
+        <input id="debtAPR" type="number" placeholder="APR % e.g. 18" style="width:140px">
+        <input id="debtMin" type="number" placeholder="Min/mo e.g. 25" style="width:140px">
+        <button id="debtCalc">Estimate</button>
       </div>
-      <div style="margin-top:8px; position:relative">
-        <div class="progress"><div id="bar" class="bar" style="width:0%"></div></div>
-        <div class="ms" style="left:25%" data-p="25%"></div>
-        <div class="ms" style="left:50%" data-p="50%"></div>
-        <div class="ms" style="left:75%" data-p="75%"></div>
-        <div class="ms" style="left:100%" data-p="100%"></div>
-      </div>
-      <div class="between" style="margin-top:6px"><small>Goal</small><small id="goalText">—</small></div>
-    </section>
+      <div id="debtOut" class="muted" style="margin-top:6px"></div>
+    </div>
+  </section>
 
-    <!-- Competitions -->
-    <section class="card">
-      <h3>Competitions</h3>
-      <div class="row">
-        <input id="nameIn" placeholder="Your name" style="flex:1">
-        <select id="regionIn">
-          <option value="NA">North America</option><option value="EU">Europe</option>
-          <option value="AS">Asia</option><option value="SA">South America</option>
-          <option value="AF">Africa</option><option value="OC">Oceania</option>
-        </select>
-        <select id="boardMode" style="margin-left:auto">
-          <option value="friends">Friends</option><option value="region" selected>Region</option><option value="world">World</option>
-        </select>
-      </div>
-      <small id="boardTip">Showing top savers in your region.</small>
-      <ul id="board" style="margin-top:8px"></ul>
-    </section>
+  <!-- RIGHT: Competitions -->
+  <aside class="right">
+    <h3 class="section-title">Competitions</h3>
+    <div class="row" style="gap:8px">
+      <select id="compMode">
+        <option value="friends">Friends</option>
+        <option value="region" selected>Region</option>
+        <option value="world">World</option>
+      </select>
+      <button id="refreshBoard">Refresh</button>
+    </div>
+    <ul id="board" style="margin-top:8px"></ul>
+  </aside>
+</main>
 
-    <!-- ✅ Reset App -->
-    <section class="card">
-      <h3>Reset App</h3>
-      <button id="resetAll" class="danger">Reset Everything</button>
-      <small style="display:block;margin-top:6px;color:#64748b">
-        Clears all history, goals, streaks, and name.
-      </small>
-    </section>
-  </main>
-
-  <div id="toast" class="toast"></div>
-
+<div id="toast" class="toast"></div>
 <script>
-const $=id=>document.getElementById(id);
-const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
-const QUOTES=[
-  'Small wins add up to big success.','You just paid your future self.','Skip a treat, grow a streak.',
-  'Save today, thank yourself tomorrow.','Consistency beats intensity.','Every $5 counts — keep going!',
-  'One less impulse, one step closer.','Tiny habits → huge outcomes.','Great job — keep the momentum!','Invest in your goals, not impulses.'
-];
-const state={
-  cur: localStorage.getItem('mm_cur')||'USD',
-  goal:+(localStorage.getItem('mm_goal')||50),
-  hist: JSON.parse(localStorage.getItem('mm_hist')||'[]'),
-  streak:+(localStorage.getItem('mm_streak')||0),
-  last: localStorage.getItem('mm_last')||null,
-  cats:['Coffee','Snacks','Clothes','Gadgets','Rides'],
-  sound: localStorage.getItem('mm_sound')!=='0',
-  name:'You',
-  milestone:+(localStorage.getItem('mm_milestone')||0)
-};
-function setk(k,v){localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));}
-function fmt(n){return C[state.cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function totalSaved(){return state.hist.reduce((s,h)=>s+Number(h.amt||0),0);}
-function monthSaved(){return state.hist.reduce((s,h)=>s+Number(h.amt||0),0);}
-let audioCtx;
-function playDing(){if(!state.sound)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.0001;g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.25);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.28);}catch(e){}}
+/* ========================  STATE  ========================= */
+const $ = id => document.getElementById(id);
+const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
+Object.keys(C).forEach(k=>{
+  const o=document.createElement('option');
+  o.value=k; o.textContent=k+' '+C[k];
+  $('currency').append(o);
+});
+$('currency').value=localStorage.getItem('mm_cur')||'USD';
+
+/* Persistent state  */
+let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]');
+let goal = +localStorage.getItem('mm_goal')||0;
+let streak = +localStorage.getItem('mm_streak')||0;
+let last = localStorage.getItem('mm_last')||null;
+let name = localStorage.getItem('mm_name')||'You';
+let level = +localStorage.getItem('mm_level')||1;
+let badges = JSON.parse(localStorage.getItem('mm_badges')||'[]');
+let challenges = JSON.parse(localStorage.getItem('mm_chals')||'[]');
+let soundOn = localStorage.getItem('mm_sound')!=='0';
+$('soundToggle').checked = soundOn;
+
+/* ========================  HELPERS  ========================= */
+function fmt(n){
+  const cur=$('currency').value;
+  return C[cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function totalSaved(){return hist.reduce((s,h)=>s+Number(h.amt||0),0);}
+function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+
+/* ========================  UI FEEDBACK  ========================= */
 let toastTimer=null;
-function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
-function confetti(count=120){const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];for(let i=0;i<count;i++){const el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.transform='rotate('+(Math.random()*360)+'deg)';el.style.animationDelay=(Math.random()*0.3)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),2000);}}
-function saveInstead(amt){amt=Number(amt);if(!amt||amt<=0)return;state.hist.push({ts:Date.now(),amt});setk('mm_hist',state.hist);state.streak++;setk('mm_streak',state.streak);$('quote').textContent='💡 '+QUOTES[Math.floor(Math.random()*QUOTES.length)];playDing();showToast(`Saved ${fmt(amt)} instead 🎉`);render();}
-function setGoal(){const g=+($('goalIn').value||0);if(!g||g<=0)return;state.goal=g;setk('mm_goal',g);render();}
-function checkMilestones(pct){[25,50,75,100].forEach(m=>{if(pct>=m&&state.milestone<m){state.milestone=m;setk('mm_milestone',m);confetti();showToast(`${m}% goal milestone 🎯`);}});}
-function computeScore(){return Math.round(totalSaved()+state.streak*5);}
-function renderMiniBoard(){$('miniBoard').innerHTML=`<li>1. Alex T. — 240</li><li>2. Jordan S. — 210</li><li>3. You (you) — ${computeScore()}</li>`;}
-function renderBoard(){$('board').innerHTML=`<li>1. Casey N. — 366</li><li>2. Jamie M. — 318</li><li>3. Riley K. — 287</li><li>4. Jamie A. — 252</li><li>5. Casey L. — 204</li><li>6. Drew H. — 156</li><li>7. You (you) — ${computeScore()}</li>`;}
-function render(){$('mThis').textContent=fmt(monthSaved());$('mStreak').textContent=state.streak+' days';$('mLife').textContent=fmt(totalSaved());$('mTotal').textContent=fmt(totalSaved());$('goalText').textContent=state.goal?fmt(state.goal):'—';const pct=state.goal?Math.min(100,Math.round(totalSaved()/state.goal*100)):0;$('bar').style.width=pct+'%';checkMilestones(pct);renderMiniBoard();renderBoard();}
-document.addEventListener('DOMContentLoaded',()=>{const idx=(new Date().getDate())%QUOTES.length;$('qodText').textContent=QUOTES[idx];$('soundToggle').checked=!!state.sound;$('soundToggle').addEventListener('change',e=>{state.sound=e.target.checked;setk('mm_sound',state.sound?'1':'0');showToast(state.sound?'Sound on 🔊':'Sound off 🔇');});$('save').addEventListener('click',()=>{const raw=$('amount').value.replace(/[^0-9.]/g,'');const amt=parseFloat(raw||'0');if(!amt||amt<=0){$('amount').focus();return;}saveInstead(amt);$('amount').value='';});document.querySelectorAll('[data-amt]').forEach(b=>b.addEventListener('click',()=>{$('amount').value=b.getAttribute('data-amt');}));$('gSet').addEventListener('click',setGoal);$('resetAll').addEventListener('click',()=>{if(confirm('Reset all saved data?')){localStorage.clear();location.reload();}});render();});
+function toast(msg){
+  const t=$('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+let audioCtx;
+function ding(){
+  if(!$('soundToggle').checked) return;
+  try{
+    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.value=0.0001;
+    g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.25);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime+0.28);
+  }catch(e){}
+}
+function confetti(n=120){
+  const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.transform='rotate('+(Math.random()*360)+'deg)';
+    c.style.animationDelay=(Math.random()*0.3)+'s';
+    document.body.append(c);
+    setTimeout(()=>c.remove(),2000);
+  }
+}
+
+/* ========================  SAVE FLOW  ========================= */
+function logSave(){
+  const raw=$('amount').value.replace(/[^0-9.]/g,'');
+  const amt=parseFloat(raw||'0');
+  if(!amt){$('amount').focus();return;}
+  const cat=$('category').value||'Other';
+  const note=$('note').value.trim();
+
+  const rec={ts:Date.now(),amt,cat,note};
+  hist.push(rec);
+  localStorage.setItem('mm_hist',JSON.stringify(hist));
+
+  // Streak
+  const today=ymd(new Date());
+  const lastDay=last? ymd(new Date(+last)) : null;
+  if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; }
+  else { streak=1; }
+  last=String(Date.now());
+  localStorage.setItem('mm_last',last);
+  localStorage.setItem('mm_streak',streak);
+
+  ding();
+  toast(`Saved ${fmt(amt)} instead 🎉`);
+  $('thinking').classList.add('show');
+  setTimeout(()=>{
+    showAI(amt,cat,note);
+    $('thinking').classList.remove('show');
+    renderAll();
+  },600);
+}
+
+/* ========================  AI INSIGHTS  ========================= */
+function classify(text){
+  const map={coffee:'Coffee',snack:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',uber:'Rides',ride:'Rides'};
+  text=text.toLowerCase();
+  for(const k in map){if(text.includes(k))return map[k];}
+  return 'Other';
+}
+function riskScore(cat,amt){
+  const hour=new Date().getHours();
+  const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1;
+  const late=(hour>=22||hour<=5)?2:0;
+  const price=Math.min(amt/20,4);
+  return Math.max(1,Math.min(10,Math.round(base+late+price)));
+}
+function pickInvestmentSuggestion(amount){
+  const ideas=[
+    `Add ${fmt(amount)} to a high-yield savings account.`,
+    `Invest ${fmt(amount)} in a diversified index fund (e.g. S&P 500 ETF).`,
+    `Try a micro-investing app to auto-invest ${fmt(amount)}.`,
+    `Put ${fmt(amount)} into a green-energy ETF — invest sustainably.`,
+    `Use ${fmt(amount)} for a finance course — learn, then earn.`
+  ];
+  return ideas[Math.floor(Math.random()*ideas.length)];
+}
+function pickImpact(amt){
+  const kg=Math.round(amt*0.4);
+  const lines=[
+    `You avoided roughly ${kg} kg CO₂ by skipping delivery.`,
+    `Equivalent to planting ${(kg/7).toFixed(1)} trees.`,
+    `Reduced waste and packaging impact by ${kg} kg CO₂e.`
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+function showAI(amt,cat,note){
+  const det=note||'manual entry';
+  const finalCat=classify(note)||cat;
+  const risk=riskScore(finalCat,amt);
+  $('aiDetected').textContent=det;
+  $('aiCategory').textContent=finalCat;
+  $('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`;
+  $('aiSuggest').textContent=`Skip and save ${fmt(amt)} — great call!`;
+  $('whatDo').textContent=pickInvestmentSuggestion(amt);
+  $('impact').textContent=pickImpact(amt);
+  $('aiExplain').textContent='(based on keywords, price, time of day)';
+}
+
+/* ========================  GOALS  ========================= */
+function updateGoalBar(){
+  const pct=goal?Math.min(100,Math.round(totalSaved()/goal*100)):0;
+  $('goalPct').textContent=pct+'%';
+  $('goalBar').style.width=pct+'%';
+  $('goalText').textContent=goal?`Goal: ${fmt(goal)}`:'No goal set';
+  if(pct===100){confetti(150);toast('Goal achieved! 🎯');}
+}
+function setGoal(){const g=+($('goalIn').value||0);if(!g)return;goal=g;localStorage.setItem('mm_goal',goal);toast('Goal set 🎯');updateGoalBar();}
+
+/* ========================  HISTORY  ========================= */
+function renderHistory(){
+  const ul=$('history');ul.innerHTML='';
+  hist.slice().reverse().slice(0,30).forEach(h=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%">
+      <span>${new Date(h.ts).toLocaleString()}</span>
+      <span><strong>${fmt(h.amt)}</strong> <small class="muted">${h.cat}</small></span>
+    </div>${h.note?`<div class="muted">${h.note}</div>`:''}`;
+    ul.appendChild(li);
+  });
+}
+
+/* ========================  PROFILE / BADGES / LEVELS  ========================= */
+function ensureBadge(id,label){
+  if(!badges.find(b=>b.id===id)){
+    badges.push({id,label,ts:Date.now()});
+    localStorage.setItem('mm_badges',JSON.stringify(badges));
+  }
+}
+function updateBadgesLevels(){
+  const s=totalSaved();
+  const lvl=Math.max(1,Math.floor(s/100)+1);
+  if(lvl>level){level=lvl;localStorage.setItem('mm_level',lvl);confetti(100);toast(`Level ${lvl} unlocked 🎉`);}
+  if(hist.length>=1)ensureBadge('first','First Save 🎉');
+  if(s>=100)ensureBadge('100','Saved $100 🏅');
+  if(s>=500)ensureBadge('500','Saved $500 💰');
+  if(s>=1000)ensureBadge('1000','Saved $1000 💎');
+  if(hist.filter(h=>h.cat==='Coffee').length>=5)ensureBadge('c5','Skipped Coffee ×5 ☕');
+}
+function renderProfile(){
+  $('mTotal').textContent=fmt(totalSaved());
+  $('mStreak').textContent=streak+' days';
+  $('mLevel').textContent=level;
+  $('levelBar').style.width=(totalSaved()%100)+'%';
+  const wrap=$('badges');wrap.innerHTML='';
+  badges.forEach(b=>{const s=document.createElement('span');s.className='chip';s.textContent=b.label;wrap.appendChild(s);});
+  const cl=$('challengeList');cl.innerHTML='';
+  challenges.forEach(c=>{const li=document.createElement('li');li.textContent=`${c.name} — ${c.done?'✅':'In progress'}`;cl.appendChild(li);});
+}
+
+/* ========================  COACH & DEBT  ========================= */
+function coachReply(q){
+  const s=totalSaved(),st=streak;
+  q=q.toLowerCase();
+  if(q.includes('how'))return`You’ve saved ${fmt(s)} total and kept a ${st}-day streak.`;
+  if(q.includes('goal'))return goal?`Your goal is ${fmt(goal)} (${Math.min(100,Math.round(s/goal*100))}% done).`:`Set a goal to start tracking.`;
+  if(q.includes('invest'))return`After hitting your goal, try auto-investing ${fmt(25)} per week.`;
+  return`Stay consistent — small wins add up fast!`;
+}
+function debtEstimate(){
+  const bal=+($('debtBal').value||0),apr=+($('debtAPR').value||0),min=+($('debtMin').value||0);
+  if(!bal||!apr||!min){$('debtOut').textContent='Enter balance, APR, and minimum.';return;}
+  const r=apr/100/12;let B=bal,m=0;
+  while(B>0&&m<600){const interest=B*r;const pay=Math.max(min,interest+1);B=B+interest-pay;m++;}
+  const yrs=(m/12).toFixed(1);
+  const strat=(apr>15)?'Avalanche (highest APR first)':'Snowball (lowest balance first)';
+  $('debtOut').textContent=`Payoff ≈ ${yrs} years. Suggested strategy: ${strat}.`;
+}
+
+/* ========================  LEADERBOARD  ========================= */
+function hash(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function prng(seed){let x=seed>>>0;return()=> (x=(x*1664525+1013904223)>>>0)/0xFFFFFFFF;}
+function sampleNames(seed){const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan'];const rnd=prng(seed);const out=[];for(let i=0;i<6;i++){out.push(base[Math.floor(rnd()*base.length)]+' '+String.fromCharCode(65+Math.floor(rnd()*26))+'.');}return out;}
+function renderBoard(){
+  const mode=$('compMode').value,ul=$('board');ul.innerHTML='';
+  const me={name,score:Math.round(totalSaved()+streak*5),me:true};
+  const seedStr=mode+':'+'NA';
+  const names=sampleNames(hash(seedStr)+12345);
+  const rnd=prng(hash(seedStr));
+  const peers=names.map(n=>({name:n,score:Math.round(rnd()*400+50)}));
+  const all=[me,...peers].sort((a,b)=>b.score-a.score).slice(0,8);
+  all.forEach((p,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%">
+      <span>${i+1}. <strong>${p.name}</strong>${p.me?' <small>(you)</small>':''}</span>
+      <span>${p.score}</span>
+    </div>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ========================  INSIGHTS (charts) ========================= */
+function drawBarChart(){
+  const svg=$('barChart');while(svg.firstChild)svg.removeChild(svg.firstChild);
+  const by={};hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt;});
+  const cats=Object.keys(by);const vals=Object.values(by);
+  if(!cats.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;}
+  const w=svg.clientWidth||300,h=svg.clientHeight||180,pad=28,max=Math.max(...vals,10);
+  cats.forEach((k,i)=>{
+    const bw=(w-pad*2)/cats.length-8;
+    const x=pad+i*((w-pad*2)/cats.length);
+    const bh=(h-pad*2)*(by[k]/max);
+    const y=h-pad-bh;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',bw);r.setAttribute('height',bh);
+    r.setAttribute('fill','#22c55e');r.setAttribute('rx','4');svg.appendChild(r);
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',x+bw/2);lbl.setAttribute('y',h-8);lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('fill','#64748b');lbl.setAttribute('font-size','11');lbl.textContent=k;svg.appendChild(lbl);
+  });
+}
+function drawPieChart(){
+  const svg=$('pieChart');while(svg.firstChild)svg.removeChild(svg.firstChild);
+  const by={};hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt;});
+  const entries=Object.entries(by);if(!entries.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;}
+  const w=svg.clientWidth||300,h=svg.clientHeight||180,cx=w/2,cy=h/2,r=Math.min(w,h)/3,sum=entries.reduce((a,[,v])=>a+v,0);
+  let a0=0;const colors=['#2563eb','#22c55e','#f59e0b','#ef4444','#a855f7'];
+  entries.forEach(([k,v],i)=>{
+    const a1=a0+2*Math.PI*(v/sum);
+    const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0);
+    const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+    const large=a1-a0>Math.PI?1:0;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`);
+    p.setAttribute('fill',colors[i%colors.length]);svg.appendChild(p);
+    a0=a1;
+  });
+}
+
+/* ========================  RENDER ALL  ========================= */
+function renderAll(){
+  renderHistory();
+  renderProfile();
+  updateGoalBar();
+  drawBarChart();
+  drawPieChart();
+  renderBoard();
+}
 </script>
+<script>
+/* =====================  INITIALISATION & EVENTS  ===================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  /* --------- Welcome modal --------- */
+  if (localStorage.getItem("mm_seen") === "1") {
+    $("welcome").style.display = "none";
+  }
+  $("startApp").onclick = () => {
+    const nm = $("welcomeName").value.trim();
+    if (nm) {
+      name = nm;
+      localStorage.setItem("mm_name", nm);
+    }
+    $("welcome").style.display = "none";
+    localStorage.setItem("mm_seen", "1");
+    toast("Welcome back, " + name + "!");
+    renderAll();
+  };
+
+  /* --------- Currency & sound --------- */
+  $("currency").onchange = e => {
+    localStorage.setItem("mm_cur", e.target.value);
+    renderAll();
+  };
+  $("soundToggle").onchange = e => {
+    soundOn = e.target.checked;
+    localStorage.setItem("mm_sound", soundOn ? "1" : "0");
+    toast(soundOn ? "Sound on 🔊" : "Sound off 🔇");
+  };
+
+  /* --------- Quick chips --------- */
+  document.querySelectorAll(".chip[data-amt]").forEach(ch =>
+    ch.addEventListener("click", () => {
+      $("amount").value = ch.getAttribute("data-amt");
+    })
+  );
+  document.querySelectorAll(".chip[data-cat]").forEach(ch =>
+    ch.addEventListener("click", () => {
+      $("category").value = ch.getAttribute("data-cat");
+    })
+  );
+
+  /* --------- Community Challenges --------- */
+  document
+    .querySelectorAll(".chip[data-chal]")
+    .forEach(ch =>
+      ch.addEventListener("click", () => {
+        const nameC = ch.getAttribute("data-chal");
+        if (!challenges.find(c => c.name === nameC)) {
+          challenges.push({ name: nameC, done: false });
+          localStorage.setItem("mm_chals", JSON.stringify(challenges));
+          toast("Joined challenge: " + nameC);
+          renderProfile();
+        }
+      })
+    );
+
+  /* --------- Tabs --------- */
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(x =>
+        x.classList.remove("active")
+      );
+      tab.classList.add("active");
+      ["save", "insights", "coach", "debt"].forEach(id =>
+        $("tab-" + id).classList.add("hidden")
+      );
+      $("tab-" + tab.dataset.tab).classList.remove("hidden");
+      renderAll();
+    });
+  });
+
+  /* --------- Core Buttons --------- */
+  $("save").onclick = () => {
+    logSave();
+    updateBadgesLevels();
+  };
+  $("gSet").onclick = () => setGoal();
+  $("resetAll").onclick = () => {
+    if (confirm("Reset all data?")) {
+      localStorage.clear();
+      location.reload();
+    }
+  };
+  $("refreshBoard").onclick = () => renderBoard();
+
+  /* --------- Coach & Debt --------- */
+  $("askCoach").onclick = () => {
+    const q = $("coachQ").value.trim();
+    if (!q) return;
+    const box = $("chat");
+    const m1 = document.createElement("div");
+    m1.className = "msg me";
+    m1.textContent = "You: " + q;
+    box.append(m1);
+    const a = document.createElement("div");
+    a.className = "msg ai";
+    a.textContent = "AI: " + coachReply(q);
+    box.append(a);
+    box.scrollTop = box.scrollHeight;
+    $("coachQ").value = "";
+  };
+  $("debtCalc").onclick = () => debtEstimate();
+
+  /* --------- Initial Render --------- */
+  renderAll();
+});
+</script>
+<!-- Optional finishing touches -->
+<script>
+  /* make sure toast hides on click (quality-of-life) */
+  document.getElementById("toast").addEventListener("click", e => {
+    e.currentTarget.classList.remove("show");
+  });
+
+  /* basic footer console message */
+  console.log("%cMoney Mind 2.0 loaded","color:#22c55e;font-weight:bold;font-size:14px");
+</script>
+
 </body>
 </html>
