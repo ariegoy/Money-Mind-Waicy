@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Money Mind 2.0 — Save Instead</title>
+<title>Money Mind — Save Instead</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -24,15 +24,15 @@
   .primary{background:var(--primary);color:#fff;border-color:var(--primary)}
   .ok{background:var(--ok);color:#fff;border-color:var(--ok)}
   .warn{background:var(--warn);color:#fff;border-color:var(--warn)}
-  main{display:grid;grid-template-columns:280px minmax(680px,1fr) 320px;gap:24px;padding:24px;max-width:1400px;margin:0 auto}
+  main{display:grid;grid-template-columns:280px minmax(700px,1fr) 340px;gap:24px;padding:24px;max-width:1450px;margin:0 auto}
   aside,.panel{background:var(--panel);border:none;border-radius:16px;box-shadow:0 2px 8px #0001;padding:16px}
   .section-title{font-weight:800;margin:0 0 16px 0;display:flex;justify-content:space-between;align-items:center}
   .muted{color:var(--muted)}
   .row{display:flex;gap:10px;align-items:center}
   .col{display:flex;flex-direction:column;gap:10px}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{border:1px dashed var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);cursor:pointer;background:#fff;transition:.2s}
-  .chip:hover{background:#e0f2fe;color:#2563eb}
+  .chip{border:1px dashed var(--line);border-radius:999px;padding:6px 10px;color:#2563eb;background:#e0f2fe;cursor:pointer;transition:.2s}
+  .chip:hover{background:#bae6fd}
   .metric{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:12px;padding:12px;text-align:center}
   .metric b{display:block;color:#a16207;font-size:12px}
   .metric strong{font-size:18px}
@@ -40,37 +40,35 @@
   .bar{height:100%;background:linear-gradient(90deg,#22c55e,#2563eb)}
   ul{list-style:none;margin:0;padding:0}
   li{padding:8px 0;border-bottom:1px solid var(--line)}
-  .tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer}
-  .tab.active{background:#22c55e;color:#fff;border-color:#22c55e}
-  .hidden{display:none}
+  /* invest cards */
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:12px}
+  .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+  .asset h4{margin:0;font-size:14px}
+  .asset small{color:var(--muted)}
+  .asset .qty{font-weight:800}
+  /* toast & confetti */
   .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transform:translateY(8px);transition:.25s;z-index:10000}
   .toast.show{opacity:1;transform:translateY(0)}
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
   .thinking{display:none;margin:6px 0;padding:6px 10px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}
   .thinking.show{display:block}
-  .chart{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
   .caption{font-size:12px;color:var(--muted);margin-top:4px}
-  @media (max-width:1100px){main{grid-template-columns:1fr}}
+  @media (max-width:1120px){main{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><div class="brand-icon"></div><h1>Money Mind — Save Instead</h1></div>
   <div class="top-actions">
-    <label class="row"><small>Currency</small>
-      <select id="currency"></select>
-    </label>
-    <label class="row" title="Ding sound on save">
-      <input type="checkbox" id="soundToggle"><small>Sound</small>
-    </label>
+    <label class="row"><small>Currency</small><select id="currency"></select></label>
+    <label class="row" title="Ding on save"><input type="checkbox" id="soundToggle"><small>Sound</small></label>
     <button id="resetAll" class="btn">Reset</button>
   </div>
 </header>
 
 <main>
-  <!-- LEFT: profile -->
+  <!-- LEFT: profile & impact -->
   <aside>
     <h3 class="section-title">Profile</h3>
     <div class="row" style="flex-wrap:wrap">
@@ -86,181 +84,126 @@
     <h3 class="section-title">Badges</h3>
     <div id="badges" class="chips"></div>
 
-    <h3 class="section-title">Community Challenges</h3>
-    <div class="chips">
-      <span class="chip" data-chal="No Takeout Week">No Takeout Week</span>
-      <span class="chip" data-chal="$20 Green Challenge">$20 Green Challenge</span>
-      <span class="chip" data-chal="Coffee Skip 5x">Coffee Skip 5x</span>
-    </div>
-    <ul id="challengeList"></ul>
+    <h3 class="section-title">Your Environmental Impact</h3>
+    <div class="barwrap"><div id="ecoBar" class="bar" style="width:0%"></div></div>
+    <small id="ecoText" class="muted">You’ve avoided ~0 kg CO₂ (0 %)</small>
+
+    <h3 class="section-title">Community Goal</h3>
+    <div class="barwrap"><div id="communityBar" class="bar" style="width:0%"></div></div>
+    <small id="communityText" class="muted">Goal: $100,000 • 0 % reached</small>
 
     <h3 class="section-title">Motivations</h3>
     <ul>
-      <li>🌍 Saving reduces waste and unnecessary shipping</li>
+      <li>🌍 Saving reduces waste & shipping</li>
       <li>📈 Small wins compound into big results</li>
       <li>💤 Peace of mind beats buyer’s remorse</li>
       <li>🎯 Purpose beats impulse</li>
     </ul>
   </aside>
 
-  <!-- CENTER: save + insights + invest + coach + debt -->
+  <!-- CENTER: Save + Invest (on first screen) + Insights + History -->
   <section class="panel">
-    <div class="tabs">
-      <button class="tab active" data-tab="save">Save</button>
-      <button class="tab" data-tab="insights">Insights</button>
-      <button class="tab" data-tab="invest">Invest</button>
-      <button class="tab" data-tab="coach">AI Coach</button>
-      <button class="tab" data-tab="debt">Debt</button>
-    </div>
+    <h3 class="section-title">Save Instead</h3>
+    <div class="row" style="gap:16px;align-items:flex-start;flex-wrap:wrap">
+      <!-- Save form -->
+      <div class="col" style="flex:1;min-width:300px">
+        <div class="row">
+          <input id="amount" placeholder="I skipped... e.g. 20.00" style="width:140px">
+          <select id="category"></select>
+          <input id="customCat" class="hidden" placeholder="Type your category…" style="flex:1">
+        </div>
+        <div class="row">
+          <input id="note" placeholder="Why I skipped (optional)" style="flex:1">
+          <button id="save" class="ok">Save Instead</button>
+        </div>
+        <div class="chips">
+          <span class="chip" data-amt="5">$5</span><span class="chip" data-amt="10">$10</span>
+          <span class="chip" data-amt="15">$15</span><span class="chip" data-amt="20">$20</span>
+          <span class="chip" data-amt="25">$25</span><span class="chip" data-amt="30">$30</span>
+        </div>
 
-    <!-- Save -->
-    <div id="tab-save">
-      <h3 class="section-title">Log a Save</h3>
-      <div class="row">
-        <input id="amount" placeholder="I skipped... e.g. 12.00" style="width:140px">
-        <select id="category"></select>
-        <input id="note" placeholder="Why I skipped (optional)" style="flex:1">
-        <button id="save" class="ok">Save Instead</button>
-      </div>
-
-      <div class="chips" style="margin-top:8px">
-        <span class="chip" data-amt="5">$5</span><span class="chip" data-amt="10">$10</span><span class="chip" data-amt="15">$15</span>
-        <span class="chip" data-amt="20">$20</span><span class="chip" data-amt="25">$25</span><span class="chip" data-amt="30">$30</span>
-        <span class="chip" data-cat="Coffee">Coffee</span><span class="chip" data-cat="Snacks">Snacks</span>
-        <span class="chip" data-cat="Clothes">Clothes</span><span class="chip" data-cat="Gadgets">Gadgets</span>
-        <span class="chip" data-cat="Rides">Rides</span><span class="chip" data-cat="Other">Other</span>
-      </div>
-
-      <div class="row" style="gap:16px;align-items:flex-start;margin-top:12px">
-        <div class="col" style="flex:1">
-          <div class="panel">
-            <div class="row" style="justify-content:space-between">
-              <div>
-                <div class="muted">Goal</div>
-                <div class="row">
-                  <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 100" style="width:140px">
-                  <button id="gSet">Set</button>
-                </div>
+        <div class="panel" style="margin-top:12px">
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <div class="muted">Goal</div>
+              <div class="row">
+                <input id="goalIn" type="number" min="1" step="1" placeholder="Set goal e.g. 100" style="width:140px">
+                <button id="gSet">Set</button>
               </div>
-              <div class="metric"><b>Progress</b><strong id="goalPct">0%</strong></div>
             </div>
-            <div style="margin-top:8px">
-              <div class="barwrap"><div id="goalBar" class="bar" style="width:0%"></div></div>
-              <small id="goalText" class="muted">No goal set</small>
-            </div>
+            <div class="metric"><b>Progress</b><strong id="goalPct">0%</strong></div>
           </div>
-
-          <div class="panel">
-            <div class="section-title">AI Insights <small id="aiExplain" class="muted"></small></div>
-            <div id="thinking" class="thinking">🤖 AI thinking… classifying & scoring risk</div>
-            <div id="aiPanel">
-              <div><b>Detected</b>: <span id="aiDetected" class="muted">—</span></div>
-              <div><b>Category</b>: <span id="aiCategory" class="muted">—</span></div>
-              <div><b>Risk</b>: <span id="aiRisk" class="muted">—</span></div>
-              <div style="margin-top:6px"><b>Suggestion</b>: <span id="aiSuggest" class="muted">—</span></div>
-              <div style="margin-top:6px"><b>What to do with it</b>: <span id="whatDo" class="muted">—</span></div>
-
-              <!-- NEW: user's own plan -->
-              <div class="row" style="margin-top:6px">
-                <input id="userPlan" placeholder="Or enter your own plan…" style="flex:1">
-                <button id="savePlan" class="btn" title="Save your plan">Save plan</button>
-              </div>
-
-              <div style="margin-top:6px"><b>Impact</b>: <span id="impact" class="muted">—</span></div>
-            </div>
+          <div style="margin-top:8px">
+            <div class="barwrap"><div id="goalBar" class="bar" style="width:0%"></div></div>
+            <small id="goalText" class="muted">No goal set</small>
           </div>
         </div>
 
-        <div class="panel" style="flex:1">
-          <div class="section-title">History</div>
-          <ul id="history"></ul>
+        <div class="panel">
+          <div class="section-title">AI Insights <small id="aiExplain" class="muted"></small></div>
+          <div id="thinking" class="thinking">🤖 AI thinking… classifying & scoring risk</div>
+          <div id="aiPanel">
+            <div><b>Detected</b>: <span id="aiDetected" class="muted">—</span></div>
+            <div><b>Category</b>: <span id="aiCategory" class="muted">—</span></div>
+            <div><b>Risk</b>: <span id="aiRisk" class="muted">—</span></div>
+            <div style="margin-top:6px"><b>Suggestion</b>: <span id="aiSuggest" class="muted">—</span></div>
+            <div style="margin-top:6px"><b>What to do with it</b>: <span id="whatDo" class="muted">—</span></div>
+            <div class="row" style="margin-top:6px">
+              <input id="userPlan" placeholder="Or enter your own plan…" style="flex:1">
+              <button id="savePlan" class="btn" title="Save your plan">Save plan</button>
+            </div>
+            <div style="margin-top:6px"><b>Impact</b>: <span id="impact" class="muted">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invest ideas on first screen -->
+      <div class="col" style="flex:1;min-width:320px">
+        <div class="panel">
+          <div class="section-title">With this amount you could buy…</div>
+          <div id="investGrid" class="grid"></div>
+          <div class="row" style="margin-top:8px"><button id="refreshInvest" class="btn">Recalculate</button></div>
+          <div class="caption">Live prices if your backend is connected; otherwise smart mock updates every 30s.</div>
         </div>
       </div>
     </div>
 
-    <!-- Insights (charts) -->
-    <div id="tab-insights" class="hidden">
-      <h3 class="section-title">Analysis of Your Saving</h3>
-      <div class="row" style="gap:12px;flex-wrap:wrap">
-        <div class="chart" style="flex:1;min-width:260px">
-          <svg id="barChart" width="100%" height="180"></svg>
-          <div class="caption">$ Saved by Category (this month)</div>
-        </div>
-        <div class="chart" style="flex:1;min-width:260px">
-          <svg id="pieChart" width="100%" height="180"></svg>
-          <div class="caption">Category Distribution</div>
-        </div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <div class="metric"><b>Best Day</b><strong id="bestDay">—</strong></div>
-        <div class="metric"><b>Top Category</b><strong id="topCat">—</strong></div>
-        <div class="metric"><b>Weekly Pace</b><strong id="weeklyPace">$0.00</strong></div>
-      </div>
-    </div>
-
-    <!-- Invest (mock live) -->
-    <div id="tab-invest" class="hidden">
-      <h3 class="section-title">Smart Investments</h3>
-      <p class="muted">With your saved amount, here’s how much of top stocks, ETFs, and mutual funds you could buy.
-      <br/><small>(Live prices will connect later — currently using local sample prices.)</small></p>
-      <div class="row" style="gap:16px;align-items:flex-start;flex-wrap:wrap">
-        <div style="flex:1;min-width:280px">
-          <h4>Stocks</h4>
-          <ul id="listStocks"></ul>
-        </div>
-        <div style="flex:1;min-width:280px">
-          <h4>ETFs</h4>
-          <ul id="listETFs"></ul>
-        </div>
-        <div style="flex:1;min-width:280px">
-          <h4>Mutual Funds</h4>
-          <ul id="listFunds"></ul>
-        </div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button id="refreshInvest" class="btn">Recalculate</button>
-      </div>
-    </div>
-
-    <!-- Coach -->
-    <div id="tab-coach" class="hidden">
-      <h3 class="section-title">Personal AI Coach</h3>
-      <div id="chat" style="border:1px solid var(--line);border-radius:12px;height:220px;overflow:auto;padding:8px;background:#fafafa"></div>
-      <div class="row" style="margin-top:6px">
-        <input id="coachQ" placeholder="Ask: What should I do with $25?" style="flex:1">
-        <button id="askCoach" class="primary">Ask</button>
-      </div>
-      <div class="panel" style="margin-top:10px">
-        <div class="section-title">Weekly Summary</div>
-        <div id="weeklySummary" class="muted">Next summary: —</div>
-      </div>
-    </div>
-
-    <!-- Debt -->
-    <div id="tab-debt" class="hidden">
-      <h3 class="section-title">Debt Helper</h3>
-      <div class="row">
-        <input id="debtBal" type="number" placeholder="Balance e.g. 500" style="width:160px">
-        <input id="debtAPR" type="number" placeholder="APR % e.g. 18" style="width:140px">
-        <input id="debtMin" type="number" placeholder="Min/mo e.g. 25" style="width:140px">
-        <button id="debtCalc" class="btn">Estimate</button>
-      </div>
-      <div id="debtOut" class="muted" style="margin-top:6px"></div>
-    </div>
+    <h3 class="section-title" style="margin-top:16px">History</h3>
+    <ul id="history"></ul>
   </section>
 
-  <!-- RIGHT: competitions -->
+  <!-- RIGHT: charts + competitions + coach + debt -->
   <aside>
-    <h3 class="section-title">Competitions</h3>
+    <h3 class="section-title">Insights</h3>
+    <div class="col" style="gap:12px">
+      <div class="panel">
+        <svg id="barChart" width="100%" height="170"></svg>
+        <div class="caption">$ Saved by Category (this month)</div>
+      </div>
+      <div class="panel">
+        <svg id="pieChart" width="100%" height="170"></svg>
+        <div class="caption">Category Distribution</div>
+      </div>
+      <div class="row">
+        <div class="metric" style="flex:1"><b>Best Day</b><strong id="bestDay">—</strong></div>
+        <div class="metric" style="flex:1"><b>Top Category</b><strong id="topCat">—</strong></div>
+      </div>
+    </div>
+
+    <h3 class="section-title" style="margin-top:16px">Competitions</h3>
     <div class="row" style="gap:8px">
-      <select id="compMode">
-        <option value="friends">Friends</option>
-        <option value="region" selected>Region</option>
-        <option value="world">World</option>
-      </select>
+      <select id="compMode"><option value="friends">Friends</option><option value="region" selected>Region</option><option value="world">World</option></select>
       <button id="refreshBoard" class="btn">Refresh</button>
     </div>
     <ul id="board" style="margin-top:8px"></ul>
+
+    <h3 class="section-title" style="margin-top:16px">AI Coach</h3>
+    <div id="chat" style="border:1px solid var(--line);border-radius:12px;height:180px;overflow:auto;padding:8px;background:#fafafa"></div>
+    <div class="row" style="margin-top:6px"><input id="coachQ" placeholder="Ask: What should I do with $25?" style="flex:1"><button id="askCoach" class="primary">Ask</button></div>
+
+    <h3 class="section-title" style="margin-top:16px">Debt</h3>
+    <div class="row"><input id="debtBal" type="number" placeholder="Balance e.g. 500" style="width:120px"><input id="debtAPR" type="number" placeholder="APR % e.g. 18" style="width:100px"><input id="debtMin" type="number" placeholder="Min/mo e.g. 25" style="width:100px"><button id="debtCalc" class="btn">Estimate</button></div>
+    <div id="debtOut" class="muted" style="margin-top:6px"></div>
   </aside>
 </main>
 
@@ -268,43 +211,54 @@
 
 <script>
 /* ---------- state ---------- */
-const $ = id => document.getElementById(id);
-const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
+const $=id=>document.getElementById(id);
+const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
 Object.keys(C).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k+' '+C[k];$('currency').append(o);});
-$('currency').value = localStorage.getItem('mm_cur') || 'USD';
-let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]');
-let goal = +localStorage.getItem('mm_goal')||0;
-let streak = +localStorage.getItem('mm_streak')||0;
-let last = localStorage.getItem('mm_last')||null;
-let level = +localStorage.getItem('mm_level')||1;
-let badges = JSON.parse(localStorage.getItem('mm_badges')||'[]');
-let challenges = JSON.parse(localStorage.getItem('mm_chals')||'[]');
-let soundOn = localStorage.getItem('mm_sound')!=='0';
-$('soundToggle').checked = soundOn;
+$('currency').value=localStorage.getItem('mm_cur')||'USD';
+
+let hist=JSON.parse(localStorage.getItem('mm_hist')||'[]');
+let goal=+localStorage.getItem('mm_goal')||0;
+let streak=+localStorage.getItem('mm_streak')||0;
+let last=localStorage.getItem('mm_last')||null;
+let level=+localStorage.getItem('mm_level')||1;
+let badges=JSON.parse(localStorage.getItem('mm_badges')||'[]');
+let challenges=JSON.parse(localStorage.getItem('mm_chals')||'[]');
+let soundOn=localStorage.getItem('mm_sound')!=='0';
+$('soundToggle').checked=soundOn;
+
 function fmt(n){const cur=$('currency').value;return C[cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
 function totalSaved(){return hist.reduce((s,h)=>s+Number(h.amt||0),0);}
+function thisMonth(ts){const d=new Date(ts),n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();}
+function monthSaved(){return hist.filter(h=>thisMonth(h.ts)).reduce((s,h)=>s+Number(h.amt||0),0);}
 function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
 
 /* ---------- feedback ---------- */
-let toastTimer=null;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
-let audioCtx;function ding(){ if(!$('soundToggle').checked) return; try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.0001;g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.25);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.28);}catch(e){}}
+let toastTimer=null;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2000);}
+let audioCtx;function ding(){if(!$('soundToggle').checked) return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.0001;g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.25);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+0.28);}catch(e){}}
 function confetti(n=120){const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7'];for(let i=0;i<n;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=colors[i%colors.length];c.style.transform='rotate('+(Math.random()*360)+'deg)';c.style.animationDelay=(Math.random()*0.3)+'s';document.body.append(c);setTimeout(()=>c.remove(),2000);}}
 
-/* ---------- save flow ---------- */
+/* ---------- SAVE FLOW ---------- */
 function logSave(){
   const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt){$('amount').focus();return;}
-  const cat=$('category').value||'Other'; const note=$('note').value.trim();
-  const rec={ts:Date.now(),amt,cat,note}; hist.push(rec); localStorage.setItem('mm_hist',JSON.stringify(hist));
+  let cat=$('category').value||'Other';
+  const custom=$('customCat').value.trim();
+  if(cat==='Other' && custom) cat=custom;
+
+  const note=$('note').value.trim();
+  const rec={ts:Date.now(),amt,cat,note};
+  hist.push(rec); localStorage.setItem('mm_hist',JSON.stringify(hist));
+
   // streak
   const today=ymd(new Date()); const lastDay=last? ymd(new Date(+last)) : null;
   if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; } else { streak=1; }
   last=String(Date.now()); localStorage.setItem('mm_last',last); localStorage.setItem('mm_streak',streak);
+
   ding(); toast(`Saved ${fmt(amt)} instead 🎉`);
   $('thinking').classList.add('show'); setTimeout(()=>{ showAI(amt,cat,note); $('thinking').classList.remove('show'); renderAll(); },600);
 }
 
-/* ---------- AI insights ---------- */
-function classify(text){const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in map){ if(text.includes(k)) return map[k]; } return 'Other';}
+/* ---------- AI INSIGHTS ---------- */
+function classify(text){const m={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in m){ if(text.includes(k)) return m[k]; } return 'Other';}
 function riskScore(cat,amt){const hour=new Date().getHours();const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1; const late=(hour>=22||hour<=5)?2:0; const price=Math.min(amt/20,4); return Math.max(1,Math.min(10,Math.round(base+late+price)));}
 function pickInvestIdea(amount){
   const ideas=[
@@ -312,12 +266,12 @@ function pickInvestIdea(amount){
     `Invest ${fmt(amount)} in a diversified ETF (e.g., VOO/SPY).`,
     `Try micro-investing (Acorns/Stash) to auto-invest ${fmt(amount)}.`,
     `Put ${fmt(amount)} into a clean-energy ETF (ICLN).`,
-    `Use ${fmt(amount)} for a finance course — learn, then earn.`,
-    `Buy fractional shares of a company you believe in with ${fmt(amount)}.`
+    `Buy fractional shares you believe in with ${fmt(amount)}.`,
+    `Use ${fmt(amount)} for a finance course — learn, then earn.`
   ];
   return ideas[Math.floor(Math.random()*ideas.length)];
 }
-function pickImpact(amt){const kg=Math.round(amt*0.4);const lines=[`You avoided ~${kg} kg CO₂ by skipping this.`,`Equivalent to planting ${(kg/7).toFixed(1)} trees.`];return lines[Math.floor(Math.random()*lines.length)];}
+function pickImpact(amt){const kg=Math.round(amt*0.4);return `You avoided ~${kg} kg CO₂ (≈ ${(kg/7).toFixed(1)} trees)`;}
 function showAI(amt,cat,note){
   const det=note||'manual entry'; const finalCat=classify(note)||cat; const risk=riskScore(finalCat,amt);
   $('aiDetected').textContent=det; $('aiCategory').textContent=finalCat; $('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`;
@@ -325,128 +279,176 @@ function showAI(amt,cat,note){
   $('whatDo').textContent=pickInvestIdea(amt);
   $('impact').textContent=pickImpact(amt);
   $('aiExplain').textContent='(keywords + price + time)';
-  renderInvestList(amt); // fill the Invest tab with mock prices
+  currentAmount = amt; // for live invest updates
+  renderInvestGrid(amt);
 }
 
-/* ---------- goals / profile / badges ---------- */
+/* ---------- GOAL / PROFILE / BADGES / IMPACT ---------- */
 function updateGoalBar(){ const pct=goal?Math.min(100,Math.round(totalSaved()/goal*100)):0; $('goalPct').textContent=pct+'%'; $('goalBar').style.width=pct+'%'; $('goalText').textContent=goal?`Goal: ${fmt(goal)}`:'No goal set'; if(pct===100){confetti(150);toast('Goal achieved! 🎯');}}
 function setGoal(){const g=+($('goalIn').value||0); if(!g) return; goal=g; localStorage.setItem('mm_goal',goal); toast('Goal set 🎯'); updateGoalBar();}
 function ensureBadge(id,label){ if(!badges.find(b=>b.id===id)){ badges.push({id,label,ts:Date.now()}); localStorage.setItem('mm_badges',JSON.stringify(badges)); }}
 function updateBadgesLevels(){ const s=totalSaved(); const lvl=Math.max(1,Math.floor(s/100)+1); if(lvl>level){ level=lvl; localStorage.setItem('mm_level',level); confetti(120); toast(`Level ${level} unlocked 🎉`);} if(hist.length>=1)ensureBadge('first','First Save 🎉'); if(s>=100)ensureBadge('100','Saved $100 🏅'); if(s>=500)ensureBadge('500','Saved $500 💰'); if(s>=1000)ensureBadge('1000','Saved $1000 💎'); if(hist.filter(h=>h.cat==='Coffee').length>=5)ensureBadge('c5','Skipped Coffee ×5 ☕');}
-function renderProfile(){ $('mTotal').textContent=fmt(totalSaved()); $('mStreak').textContent=streak+' days'; $('mLevel').textContent=level; $('levelBar').style.width=(totalSaved()%100)+'%'; const wrap=$('badges'); wrap.innerHTML=''; badges.forEach(b=>{const s=document.createElement('span'); s.className='chip'; s.textContent=b.label; wrap.appendChild(s);}); const cl=$('challengeList'); cl.innerHTML=''; challenges.forEach(c=>{const li=document.createElement('li'); li.textContent=`${c.name} — ${c.done?'✅':'In progress'}`; cl.appendChild(li);});}
+function renderProfile(){ $('mTotal').textContent=fmt(totalSaved()); $('mStreak').textContent=streak+' days'; $('mLevel').textContent=level; $('levelBar').style.width=(totalSaved()%100)+'%'; const wrap=$('badges'); wrap.innerHTML=''; badges.forEach(b=>{const s=document.createElement('span'); s.className='chip'; s.textContent=b.label; wrap.appendChild(s);});}
+const COMMUNITY_GOAL=100000; let communityTotal=25000; // demo base
+function renderImpact(){
+  const my=totalSaved(); const kg=Math.round(my*0.4); const ecoPct=Math.min(100,Math.round((kg/400)*100)); // 400kg target demo
+  $('ecoBar').style.width=ecoPct+'%'; $('ecoText').textContent=`You’ve avoided ~${kg} kg CO₂ (${ecoPct} %)`;
+  const comm=my+communityTotal; const pct=Math.min(100,((comm/COMMUNITY_GOAL)*100).toFixed(1));
+  $('communityBar').style.width=pct+'%'; $('communityText').textContent=`Goal: ${fmt(COMMUNITY_GOAL)} • ${pct}% reached`;
+}
 
-/* ---------- history ---------- */
+/* ---------- HISTORY & CHARTS ---------- */
 function renderHistory(){ const ul=$('history'); ul.innerHTML=''; hist.slice().reverse().slice(0,30).forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%"><span>${new Date(h.ts).toLocaleString()}</span><span><strong>${fmt(h.amt)}</strong> <small class="muted">${h.cat}</small></span></div>${h.note?`<div class="muted">${h.note}</div>`:''}`; ul.appendChild(li); });}
+function drawBarChart(){ const svg=$('barChart'); while(svg.firstChild) svg.removeChild(svg.firstChild); const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); const cats=Object.keys(by); const vals=Object.values(by); if(!cats.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;} const w=svg.clientWidth||300,h=svg.clientHeight||170,pad=28,max=Math.max(...vals,10); cats.forEach((k,i)=>{ const bw=(w-pad*2)/cats.length-8; const x=pad+i*((w-pad*2)/cats.length); const bh=(h-pad*2)*(by[k]/max); const y=h-pad-bh; const r=document.createElementNS('http://www.w3.org/2000/svg','rect'); r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',bh); r.setAttribute('fill','#22c55e'); r.setAttribute('rx','4'); svg.appendChild(r); const lbl=document.createElementNS('http://www.w3.org/2000/svg','text'); lbl.setAttribute('x',x+bw/2); lbl.setAttribute('y',h-8); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('fill','#64748b'); lbl.setAttribute('font-size','11'); lbl.textContent=k; svg.appendChild(lbl); });}
+function drawPieChart(){ const svg=$('pieChart'); while(svg.firstChild) svg.removeChild(svg.firstChild); const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); const entries=Object.entries(by); if(!entries.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;} const w=svg.clientWidth||300,h=svg.clientHeight||170,cx=w/2,cy=h/2,r=Math.min(w,h)/3,sum=entries.reduce((a,[,v])=>a+v,0); let a0=0; const colors=['#2563eb','#22c55e','#f59e0b','#ef4444','#a855f7']; entries.forEach(([k,v],i)=>{ const a1=a0+2*Math.PI*(v/sum); const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0); const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1); const large=a1-a0>Math.PI?1:0; const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`); p.setAttribute('fill',colors[i%colors.length]); svg.appendChild(p); a0=a1; });}
+function bestDay(){const by={}; hist.forEach(h=>{const d=new Date(h.ts).toLocaleDateString(); by[d]=(by[d]||0)+h.amt;}); let m=0, k='—'; Object.entries(by).forEach(([d,v])=>{if(v>m){m=v;k=d;}}); return k;}
+function topCategory(){const by={}; hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); let m=0,k='—'; Object.entries(by).forEach(([d,v])=>{if(v>m){m=v;k=d;}}); return k;}
 
-/* ---------- insights charts ---------- */
-function drawBarChart(){ const svg=$('barChart'); while(svg.firstChild) svg.removeChild(svg.firstChild); const by={}; hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); const cats=Object.keys(by); const vals=Object.values(by); if(!cats.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;} const w=svg.clientWidth||300,h=svg.clientHeight||180,pad=28,max=Math.max(...vals,10); cats.forEach((k,i)=>{ const bw=(w-pad*2)/cats.length-8; const x=pad+i*((w-pad*2)/cats.length); const bh=(h-pad*2)*(by[k]/max); const y=h-pad-bh; const r=document.createElementNS('http://www.w3.org/2000/svg','rect'); r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',bh); r.setAttribute('fill','#22c55e'); r.setAttribute('rx','4'); svg.appendChild(r); const lbl=document.createElementNS('http://www.w3.org/2000/svg','text'); lbl.setAttribute('x',x+bw/2); lbl.setAttribute('y',h-8); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('fill','#64748b'); lbl.setAttribute('font-size','11'); lbl.textContent=k; svg.appendChild(lbl); });}
-function drawPieChart(){ const svg=$('pieChart'); while(svg.firstChild) svg.removeChild(svg.firstChild); const by={}; hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); const entries=Object.entries(by); if(!entries.length){svg.innerHTML='<text x="10" y="90" fill="#94a3b8">No data yet</text>';return;} const w=svg.clientWidth||300,h=svg.clientHeight||180,cx=w/2,cy=h/2,r=Math.min(w,h)/3,sum=entries.reduce((a,[,v])=>a+v,0); let a0=0; const colors=['#2563eb','#22c55e','#f59e0b','#ef4444','#a855f7']; entries.forEach(([k,v],i)=>{ const a1=a0+2*Math.PI*(v/sum); const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0); const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1); const large=a1-a0>Math.PI?1:0; const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`); p.setAttribute('fill',colors[i%colors.length]); svg.appendChild(p); a0=a1; });}
-
-/* ---------- competitions (demo peers) ---------- */
+/* ---------- COMPETITIONS (demo peers) ---------- */
 function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);} return h>>>0;}
 function prng(seed){let x=seed>>>0; return ()=> (x=(x*1664525+1013904223)>>>0)/0xFFFFFFFF;}
 function sampleNames(seed){const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<7;i++){ out.push(base[Math.floor(rnd()*base.length)]+' '+String.fromCharCode(65+Math.floor(Math.random()*26))+'.'); } return out;}
 function renderBoard(){ const mode=$('compMode').value, ul=$('board'); ul.innerHTML=''; const me={name:'You',score:Math.round(totalSaved()+streak*5),me:true}; const seedStr=mode+':'+'NA'; const names=sampleNames(hash(seedStr)+12345); const rnd=prng(hash(seedStr)); const peers=names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); const all=[me,...peers].sort((a,b)=>b.score-a.score).slice(0,8); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%"><span>${i+1}. <strong>${p.name}</strong>${p.me?' <small>(you)</small>':''}</span><span>${p.score}</span></div>`; ul.appendChild(li); });}
 
-/* ---------- Invest tab (mock “live” prices) ---------- */
-const STOCKS = [
-  {symbol:"AAPL", name:"Apple", price: 190},
-  {symbol:"MSFT", name:"Microsoft", price: 410},
-  {symbol:"AMZN", name:"Amazon", price: 178},
-  {symbol:"TSLA", name:"Tesla", price: 235}
-];
-const ETFS = [
-  {symbol:"VOO", name:"S&P 500 ETF", price: 455},
-  {symbol:"VTI", name:"Total Market ETF", price: 220},
-  {symbol:"QQQ", name:"Nasdaq-100 ETF", price: 370},
-  {symbol:"ICLN", name:"Clean Energy ETF", price: 18}
-];
-const FUNDS = [
-  {symbol:"VFIAX", name:"Vanguard 500 Index Fund", price: 460},
-  {symbol:"FXAIX", name:"Fidelity 500 Index", price: 170},
-  {symbol:"SWPPX", name:"Schwab S&P 500 Index", price: 75},
-  {symbol:"VTSAX", name:"Vanguard Total Market", price: 120}
+/* ---------- INVEST LIVE/FAKE ---------- */
+const ASSETS = [
+  // stocks
+  {symbol:'AAPL', name:'Apple',      type:'Stock'},
+  {symbol:'MSFT', name:'Microsoft',  type:'Stock'},
+  {symbol:'AMZN', name:'Amazon',     type:'Stock'},
+  {symbol:'TSLA', name:'Tesla',      type:'Stock'},
+  // etfs
+  {symbol:'VOO',  name:'S&P 500 ETF',type:'ETF'},
+  {symbol:'VTI',  name:'Total Market ETF',type:'ETF'},
+  {symbol:'QQQ',  name:'Nasdaq-100 ETF', type:'ETF'},
+  {symbol:'ICLN', name:'Clean Energy ETF',type:'ETF'},
+  // mutual funds (show closing proxies)
+  {symbol:'VFIAX',name:'Vanguard 500 Index Fund',type:'Fund'},
+  {symbol:'FXAIX',name:'Fidelity 500 Index',type:'Fund'},
+  // crypto + commodities
+  {symbol:'BTC-USD',name:'Bitcoin', type:'Crypto'},
+  {symbol:'XAU/USD',name:'Gold',    type:'Commodity'},
+  {symbol:'XAG/USD',name:'Silver',  type:'Commodity'}
 ];
 
-function renderInvestList(amount){
-  const fill=(list,data)=>{
-    list.innerHTML = data.map(d=>{
-      const qty=(amount/d.price).toFixed(2);
-      return `<li><strong>${d.name}</strong> (${d.symbol}) — ${qty} shares @ $${d.price.toFixed(2)}</li>`;
-    }).join("");
-  };
-  fill($('listStocks'), STOCKS);
-  fill($('listETFs'), ETFS);
-  fill($('listFunds'), FUNDS);
-  const flat=[...STOCKS,...ETFS,...FUNDS];
-  const pick=flat[Math.floor(Math.random()*flat.length)];
-  toast(`Suggestion: ${pick.symbol} — $${pick.price.toFixed(2)} per share`);
+// mock price store (drifts slightly if backend not available)
+const mockPrices = {};
+function seedPrice(sym){
+  if(mockPrices[sym]) return mockPrices[sym];
+  const base = sym.includes('BTC') ? 60000 : sym.includes('XAU') ? 2300 : sym.includes('XAG') ? 28 :
+               sym==='VOO'||sym==='SPY'? 455 :
+               sym==='VTI'?220 : sym==='QQQ'?370 : sym==='ICLN'?18 :
+               sym==='VFIAX'?460 : sym==='FXAIX'?170 :
+               sym==='AAPL'?190 : sym==='MSFT'?410 : sym==='AMZN'?178 : sym==='TSLA'?235 : 100;
+  mockPrices[sym] = base * (0.98 + Math.random()*0.04);
+  return mockPrices[sym];
+}
+function nudgePrices(){
+  Object.keys(mockPrices).forEach(sym=>{
+    const p = mockPrices[sym];
+    mockPrices[sym] = +(p * (0.995 + Math.random()*0.01)).toFixed(2);
+  });
 }
 
-/* ---------- coach (rule-based for now; backend later) ---------- */
-function coachReply(q){
-  const s=totalSaved(), st=streak;
-  q=q.toLowerCase();
-  if(q.includes('how')) return `You’ve saved ${fmt(s)} total and kept a ${st}-day streak. Nice momentum.`;
-  if(q.includes('invest')) return `Try auto-investing ${fmt(25)} each week into a diversified ETF after you hit your goal.`;
-  if(q.includes('goal')) return goal?`Your goal is ${fmt(goal)} (${Math.min(100,Math.round(s/goal*100))}% done).`:`Set a goal to start tracking.`;
-  return `Small wins add up — consider adding ${fmt(10)} more this week.`;
+async function getQuotes(symbols){
+  try{
+    const u = "/api/quotes?symbols="+encodeURIComponent(symbols.join(","));
+    const r = await fetch(u);
+    if(!r.ok) throw new Error("backend not available");
+    const j = await r.json();
+    return j.data || [];
+  }catch(e){
+    // fallback to mock
+    return symbols.map(sym=>{
+      seedPrice(sym); return {symbol:sym, price: mockPrices[sym]};
+    });
+  }
 }
 
-/* ---------- debt helper ---------- */
-function debtEstimate(){
-  const bal=+($('debtBal').value||0), apr=+($('debtAPR').value||0), min=+($('debtMin').value||0);
-  if(!bal||!apr||!min){ $('debtOut').textContent='Enter balance, APR, and minimum.'; return; }
-  const r=apr/100/12; let B=bal, months=0;
-  while(B>0 && months<600){ const interest=B*r; const pay=Math.max(min,interest+1); B=B+interest-pay; months++; }
-  const years=(months/12).toFixed(1);
-  const approach = (apr>15)?'Avalanche (highest APR first)':'Snowball (smallest balance first)';
-  $('debtOut').textContent = `Estimated payoff: ~${months} months (~${years} years). Strategy suggestion: ${approach}.`;
+let currentAmount = 25;
+async function renderInvestGrid(amount){
+  currentAmount = amount || currentAmount || 25;
+  const grid = $('investGrid'); grid.innerHTML = "Loading…";
+
+  const syms = ASSETS.map(a=>a.symbol);
+  const data = await getQuotes(syms);
+
+  // join with meta
+  const rows = ASSETS.map(a=>{
+    const found = data.find(d=>d.symbol===a.symbol) || {};
+    const price = found.price || seedPrice(a.symbol);
+    const qty = (currentAmount/price).toFixed(2);
+    return {...a, price, qty};
+  });
+
+  // render
+  grid.innerHTML = rows.map(r=>`
+    <div class="asset">
+      <div>
+        <h4>${r.name}</h4>
+        <small>${r.symbol} • ${r.type}</small>
+      </div>
+      <div style="text-align:right">
+        <div class="qty">${r.qty}</div>
+        <small>@ $${(r.price||0).toFixed ? r.price.toFixed(2) : r.price}</small>
+      </div>
+    </div>
+  `).join("");
 }
 
-/* ---------- render & events ---------- */
-function renderAll(){ renderHistory(); renderProfile(); updateGoalBar(); drawBarChart(); drawPieChart(); renderBoard(); }
+/* auto refresh prices every 30s */
+setInterval(async ()=>{
+  nudgePrices();                 // drift mocks so UI feels alive
+  await renderInvestGrid();      // re-calc qty from latest prices
+}, 30000);
+
+/* ---------- RENDER ALL ---------- */
+function renderAll(){
+  renderHistory();
+  renderProfile();
+  updateGoalBar();
+  drawBarChart();
+  drawPieChart();
+  renderBoard();
+  renderImpact();
+}
+
 document.addEventListener("DOMContentLoaded", ()=>{
   ['Coffee','Snacks','Clothes','Gadgets','Rides','Other'].forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;$('category').append(o);});
-  document.querySelectorAll(".tab").forEach(tab=>{
-    tab.addEventListener("click", ()=>{
-      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-      tab.classList.add("active");
-      ["save","insights","invest","coach","debt"].forEach(id=>$("tab-"+id).classList.add("hidden"));
-      $("tab-"+tab.dataset.tab).classList.remove("hidden");
-      if(tab.dataset.tab==="invest"){
-        const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0')||25;
-        renderInvestList(amt);
-      }
-      renderAll();
-    });
+
+  // custom category toggling
+  $('category').addEventListener('change', e=>{
+    if(e.target.value==='Other') $('customCat').classList.remove('hidden');
+    else $('customCat').classList.add('hidden');
   });
+
   document.querySelectorAll(".chip[data-amt]").forEach(ch=>ch.addEventListener("click",()=>{$('amount').value=ch.getAttribute("data-amt");}));
-  document.querySelectorAll(".chip[data-cat]").forEach(ch=>ch.addEventListener("click",()=>{$('category').value=ch.getAttribute("data-cat");}));
   $('save').onclick = ()=>{ logSave(); updateBadgesLevels(); };
   $('gSet').onclick = ()=> setGoal();
   $('resetAll').onclick = ()=>{ if(confirm("Reset all data?")){ localStorage.clear(); location.reload(); } };
   $('refreshBoard').onclick = ()=> renderBoard();
-  $('askCoach').onclick = ()=>{ const q=$('coachQ').value.trim(); if(!q) return; const box=$('chat'); box.innerHTML+=`<div>You: ${q}</div>`; box.innerHTML+=`<div>AI: ${coachReply(q)}</div>`; box.scrollTop=box.scrollHeight; $('coachQ').value=''; };
-  $('debtCalc').onclick = ()=> debtEstimate();
+  $('refreshInvest').onclick = ()=>{ const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0')||25; renderInvestGrid(amt); };
+  $('askCoach').onclick = ()=>{ const q=$('coachQ').value.trim(); if(!q) return; const box=$('chat'); box.innerHTML+=`<div>You: ${q}</div>`; box.innerHTML+=`<div>AI: Small wins add up — consider adding ${fmt(10)} this week.</div>`; box.scrollTop=box.scrollHeight; $('coachQ').value=''; };
   $('currency').onchange = e=>{ localStorage.setItem('mm_cur', e.target.value); renderAll(); };
   $('soundToggle').onchange = e=>{ localStorage.setItem('mm_sound', e.target.checked? '1':'0'); };
 
-  // Save user's own plan
+  // save user's own plan
   $('savePlan').onclick = ()=>{
-    const plan=$('userPlan').value.trim();
-    if(!plan) return;
+    const plan = $('userPlan').value.trim(); if(!plan) return;
     localStorage.setItem('mm_plan', plan);
     toast('Plan saved: ' + plan);
     $('userPlan').value='';
   };
 
+  // first paint
   renderAll();
+  // initial invest grid
+  renderInvestGrid(25);
 });
 
-/* Click to hide toast */
+/* hide toast on click */
 document.getElementById("toast").addEventListener("click", e => e.currentTarget.classList.remove("show"));
-console.log("%cMoney Mind 2.0 loaded","color:#22c55e;font-weight:bold;font-size:14px");
+console.log("%cMoney Mind – live & colorful","color:#22c55e;font-weight:bold;font-size:14px");
 </script>
 </body>
 </html>
