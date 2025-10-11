@@ -304,11 +304,7 @@ function drawPieChart(){ const svg=$('pieChart'); while(svg.firstChild) svg.remo
 function bestDay(){const by={}; hist.forEach(h=>{const d=new Date(h.ts).toLocaleDateString(); by[d]=(by[d]||0)+h.amt;}); let m=0, k='—'; Object.entries(by).forEach(([d,v])=>{if(v>m){m=v;k=d;}}); return k;}
 function topCategory(){const by={}; hist.forEach(h=>{by[h.cat]=(by[h.cat]||0)+h.amt}); let m=0,k='—'; Object.entries(by).forEach(([d,v])=>{if(v>m){m=v;k=d;}}); return k;}
 
-/* ---------- COMPETITIONS (demo peers) ---------- */
-function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);} return h>>>0;}
-function prng(seed){let x=seed>>>0; return ()=> (x=(x*1664525+1013904223)>>>0)/0xFFFFFFFF;}
-function sampleNames(seed){const base=['Alex','Sam','Jordan','Taylor','Riley','Ari','Casey','Kai','Devin','Morgan','Drew','Jamie']; const rnd=prng(seed); const out=[]; for(let i=0;i<7;i++){ out.push(base[Math.floor(rnd()*base.length)]+' '+String.fromCharCode(65+Math.floor(Math.random()*26))+'.'); } return out;}
-function renderBoard(){ const mode=$('compMode').value, ul=$('board'); ul.innerHTML=''; const me={name:'You',score:Math.round(totalSaved()+streak*5),me:true}; const seedStr=mode+':'+'NA'; const names=sampleNames(hash(seedStr)+12345); const rnd=prng(hash(seedStr)); const peers=names.map(n=>({name:n,score:Math.round(rnd()*400+50)})); const all=[me,...peers].sort((a,b)=>b.score-a.score).slice(0,8); all.forEach((p,i)=>{ const li=document.createElement('li'); li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%"><span>${i+1}. <strong>${p.name}</strong>${p.me?' <small>(you)</small>':''}</span><span>${p.score}</span></div>`; ul.appendChild(li); });}
+
 
 /* ---------- INVEST LIVE/FAKE ---------- */
 const ASSETS = [
