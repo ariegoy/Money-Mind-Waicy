@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Money Mind — Save Instead</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
   :root{
     --bg1:#f0f9ff; --bg2:#e9f5ff; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
@@ -14,14 +15,24 @@
     --bg1:#0b1220; --bg2:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2a44;
     --primary:#4f8cff; --ok:#22c55e; --accent:#22c55e; --warn:#ef4444;
   }
+
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
+
   header{
-    position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:12px;
-    background:linear-gradient(90deg,var(--primary),var(--accent)); color:#fff; padding:14px 20px; box-shadow:0 2px 6px #0003;
+    position:sticky; top:0; z-index:100;
+    background:linear-gradient(90deg,var(--primary),var(--accent));
+    color:#fff; padding:14px 18px; box-shadow:0 2px 6px #0003;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
-  h1{margin:0;font-size:20px;font-weight:800}
-  .toggle{display:flex;gap:8px;align-items:center}
+  .logo{display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
+  .logo-icon{font-size:28px; background:linear-gradient(135deg,#22c55e,#2563eb); -webkit-background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 1px 2px #0003)}
+  .logo-text{font-size:22px;font-weight:800;text-shadow:0 1px 2px #0003}
+  .hdr-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#ffffff22;color:#fff}
+  .pill select{border:0;border-radius:8px;padding:6px 8px;background:#ffffffdd;color:#0b1220}
+  .pill label{display:flex;gap:6px;align-items:center}
+
   main{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:24px;max-width:1200px;margin:auto}
   section,aside{background:var(--panel);border-radius:16px;box-shadow:0 2px 8px #0001;padding:16px;border:1px solid var(--line)}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -31,7 +42,7 @@
   .ok{background:var(--ok);color:#fff;border:none}
   .ghost{background:transparent;border:1px dashed var(--line);color:var(--muted)}
   .muted{color:var(--muted)}
-  .metric{background:#fef9c3;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line}
+  .metric{background:#fef9c3;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
   .dark .metric{background:#0b2238}
   .metric b{display:block;font-size:12px;color:#a16207}
   .dark .metric b{color:#93c5fd}
@@ -39,34 +50,68 @@
   .barwrap{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}
   .dark .barwrap{background:#122036}
   .bar{height:100%;background:linear-gradient(90deg,var(--ok),var(--primary));transition:width .5s}
+
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
   .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;transition:opacity .3s}
   .dark .asset{background:#0f172a}
   .qty{font-weight:800}
+
   .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
   .toast.show{opacity:1}
   .quote{margin-top:6px;color:#2563eb;font-style:italic;opacity:0;transition:opacity .4s}
   .quote.show{opacity:1}
   .banner{margin:16px 0;padding:10px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fcd9bd;color:#9a3412;display:flex;justify-content:space-between;align-items:center}
   .dark .banner{background:#251a00;border-color:#7c5200;color:#ffd89a}
+
   /* ring */
   .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#e2e8f0 0);display:grid;place-items:center;border:2px solid var(--line)}
   .dark .ring{background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0); border-color:#1f2a44}
   .ring span{font-size:14px;font-weight:700;color:var(--ink)}
+
+  /* level/XP */
+  .levelbar{height:10px;border-radius:999px;background:#eef2f7;overflow:hidden}
+  .levelfill{height:100%;background:linear-gradient(90deg,#4ade80,#2563eb);transition:width .5s}
+  .dark .levelbar{background:#122036}
+
+  /* badges */
+  .badges{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+  .badge{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+  .dark .badge{background:#0f172a}
+  .badge i{font-style:normal;font-size:18px}
+
   /* charts */
   .chart{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
   .dark .chart{background:#0f172a}
   .caption{font-size:12px;color:var(--muted);margin-top:4px}
+
   @media(max-width:900px){main{grid-template-columns:1fr}}
+
   /* confetti */
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>Money Mind — Save Instead</h1>
-  <label class="toggle"><input type="checkbox" id="darkToggle"><span>Dark Mode</span></label>
+  <h1 class="logo">
+    <span class="logo-icon">🧠💵</span>
+    <span class="logo-text">Money Mind</span>
+  </h1>
+  <div class="hdr-controls">
+    <div class="pill">
+      <span>Currency</span>
+      <select id="currency">
+        <option value="USD">$ USD</option>
+        <option value="EUR">€ EUR</option>
+        <option value="GBP">£ GBP</option>
+        <option value="INR">₹ INR</option>
+      </select>
+    </div>
+    <div class="pill">
+      <label><input type="checkbox" id="darkToggle"> Dark</label>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -111,6 +156,23 @@
         <div class="barwrap"><div id="goalBar" class="bar" style="width:0%"></div></div>
         <small id="goalText" class="muted">No goal set</small>
       </div>
+    </div>
+
+    <!-- Level / XP -->
+    <div class="row" style="margin-top:12px">
+      <div style="flex:1">
+        <div class="row" style="justify-content:space-between">
+          <strong>Level <span id="lvlNum">1</span></strong>
+          <small class="muted"><span id="xpNow">0</span>/<span id="xpNext">100</span> XP</small>
+        </div>
+        <div class="levelbar"><div id="lvlFill" class="levelfill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div style="margin-top:12px">
+      <h3 style="margin:0 0 8px 0">Badges</h3>
+      <div id="badges" class="badges"></div>
     </div>
 
     <!-- AI Insights -->
@@ -172,12 +234,10 @@
 <script>
 /* ---------- helpers & state ---------- */
 const $ = id => document.getElementById(id);
-const QUOTES = [
- "Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.",
- "Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."
-];
-function fmt(n){ return '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
+function fmt(n){ const cur = localStorage.getItem('mm_cur') || 'USD'; return C[cur] + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function ymd(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+
 let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]'); // {ts, amt, cat?, note?}
 let goal = +localStorage.getItem('mm_goal') || 0;
 let goalName = localStorage.getItem('mm_goal_name') || '';
@@ -186,22 +246,33 @@ let last = localStorage.getItem('mm_last') || null;
 let dismissedReminder = localStorage.getItem('mm_rem_dismiss') === '1';
 let communityTotal = 25000; const COMMUNITY_GOAL = 100000;
 
-/* ---------- UI feedback ---------- */
+const QUOTES = [
+  "Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.",
+  "Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."
+];
+
+function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
+function weekSavesCount(){ const weekAgo = Date.now() - 7*864e5; return hist.filter(h=> h.ts >= weekAgo).length; }
+function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
+
 let toastTimer=null;
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500); }
-function confetti(n=140){ const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7']; for(let i=0;i<n;i++){ const el=document.createElement('div'); el.className='confetti'; el.style.left=Math.random()*100+'vw'; el.style.background=colors[i%colors.length]; el.style.transform='rotate('+(Math.random()*360)+'deg)'; el.style.animationDelay=(Math.random()*0.3)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),2000); }}
+function confetti(n=120){ const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7']; for(let i=0;i<n;i++){ const el=document.createElement('div'); el.className='confetti'; el.style.left=Math.random()*100+'vw'; el.style.background=colors[i%colors.length]; el.style.transform='rotate('+(Math.random()*360)+'deg)'; el.style.animationDelay=(Math.random()*0.3)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),2000); }}
+
+/* ---------- currency & theme ---------- */
+const currency = $('currency');
+currency.value = localStorage.getItem('mm_cur') || 'USD';
+currency.onchange = e => { localStorage.setItem('mm_cur', e.target.value); renderAll(); renderInvestGrid(25); };
+
+const dark=$('darkToggle');
+dark.onchange=()=>{document.body.classList.toggle('dark',dark.checked); localStorage.setItem('mm_theme',dark.checked?'dark':'light');};
+(function initTheme(){ const t=localStorage.getItem('mm_theme'); if(t==='dark'){dark.checked=true; document.body.classList.add('dark');} })();
 
 /* ---------- AI helpers ---------- */
 function classify(text){ const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in map){ if(text.includes(k)) return map[k]; } return 'Other'; }
 function riskScore(cat,amt){ const hour=new Date().getHours(); const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1; const late=(hour>=22||hour<=5)?2:0; const price=Math.min(amt/20,4); return Math.max(1,Math.min(10,Math.round(base+late+price))); }
 
-/* ---------- aggregates ---------- */
-function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
-function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
-function bestDay(){ const by={}; hist.forEach(h=>{ const d=new Date(h.ts).toLocaleDateString(); by[d]=(by[d]||0)+h.amt; }); let m=0,k='—'; Object.entries(by).forEach(([d,v])=>{ if(v>m){m=v;k=d} }); return k; }
-function topCategory(){ const by={}; hist.forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; }); let m=0,k='—'; Object.entries(by).forEach(([c,v])=>{ if(v>m){m=v;k=c} }); return k; }
-
-/* ---------- goal & rings ---------- */
+/* ---------- goal / streak / level ---------- */
 function updateGoalUI(){
   const s = totalSaved();
   const pct = goal ? Math.min(100, Math.round(s/goal*100)) : 0;
@@ -210,8 +281,23 @@ function updateGoalUI(){
   $('goalRing').style.setProperty('--p', pct);
   $('goalText').textContent = goal ? `${goalName? goalName+' • ':''}${fmt(goal)} target` : 'No goal set';
 }
+function updateStreakAndReminder(){
+  if (dismissedReminder) { $('reminder').style.display='none'; return; }
+  if (!last) { $('reminder').style.display='block'; return; }
+  $('reminder').style.display = (Date.now() - (+last) > 24*3600*1000) ? 'block' : 'none';
+}
+function updateLevelBar(){
+  const xp = totalSaved()*10; // simple XP formula
+  const level = Math.max(1, Math.floor(totalSaved()/100)+1);
+  const next = level*100; const prev=(level-1)*100;
+  const pct = Math.min(100, Math.round(((totalSaved()-prev)/(next-prev))*100));
+  $('lvlNum').textContent = level;
+  $('xpNow').textContent = Math.round(totalSaved());
+  $('xpNext').textContent = next;
+  $('lvlFill').style.width = pct + '%';
+}
 
-/* ---------- eco & community ---------- */
+/* ---------- impact ---------- */
 function updateImpact(){
   const eco = totalSaved()*0.4; // ~kg CO2
   $('ecoText').textContent = eco.toFixed(1) + ' kg';
@@ -221,7 +307,31 @@ function updateImpact(){
   $('commBar').style.width = commPct + '%';
 }
 
-/* ---------- history ---------- */
+/* ---------- badges ---------- */
+let badges = JSON.parse(localStorage.getItem('mm_badges')||'[]'); // [{id,label,icon}]
+function haveBadge(id){ return badges.some(b=>b.id===id); }
+function giveBadge(id,label,icon){ if(haveBadge(id)) return; badges.push({id,label,icon}); localStorage.setItem('mm_badges',JSON.stringify(badges)); }
+function updateBadges(){
+  const s=totalSaved(), w=weekSavesCount(), t=hist.length;
+  if(t>=1) giveBadge('first','First Save','🎉');
+  if(s>=100) giveBadge('100','$100 Saved','🥇');
+  if(s>=500) giveBadge('500','$500 Saved','🏆');
+  if(s>=1000) giveBadge('1000','$1000 Saved','💎');
+  if(streak>=5) giveBadge('streak5','5-Day Streak','🔥');
+  if(streak>=7) giveBadge('streak7','7-Day Streak','🌟');
+  if(w>=5) giveBadge('week5','5 Saves This Week','📅');
+  if(t>=10) giveBadge('10all','10 Saves Overall','🏅');
+
+  const wrap=$('badges'); wrap.innerHTML='';
+  const all=badges.length? badges : [{id:'none',label:'Make a save to unlock your first badge',icon:'💤'}];
+  all.forEach(b=>{
+    const div=document.createElement('div'); div.className='badge';
+    div.innerHTML=`<i>${b.icon}</i><span>${b.label}</span>`;
+    wrap.appendChild(div);
+  });
+}
+
+/* ---------- history & achievements ---------- */
 function renderHistory(){
   const ul = $('history'); ul.innerHTML = '';
   hist.slice().reverse().slice(0,30).forEach(h=>{
@@ -233,25 +343,10 @@ function renderHistory(){
     ul.appendChild(li);
   });
 }
-
-/* ---------- achievements ---------- */
-function weekSavesCount(){
-  const weekAgo = Date.now() - 7*864e5;
-  return hist.filter(h=> h.ts >= weekAgo).length;
-}
 function updateAchievements(){
-  const w = weekSavesCount();
-  const t = hist.length;
+  const w = weekSavesCount(); const t = hist.length;
   $('achWeek').textContent = (w>=5 ? '✅ Saved 5× this week' : `— Save 5× this week (${w}/5)`);
   $('achTotal').textContent = (t>=10 ? '✅ Saved 10× overall' : `— Save 10× overall (${t}/10)`);
-}
-
-/* ---------- reminder ---------- */
-function maybeShowReminder(){
-  if (dismissedReminder) { $('reminder').style.display='none'; return; }
-  if (!last) { $('reminder').style.display='block'; return; }
-  const lastMs = +last;
-  $('reminder').style.display = (Date.now() - lastMs > 24*3600*1000) ? 'block' : 'none';
 }
 
 /* ---------- charts (SVG) ---------- */
@@ -305,18 +400,19 @@ async function renderInvestGrid(amount){
   const data = await getQuotes(ASSETS);
   grid.innerHTML = data.filter(d=>d && d.price).map(d=>{
     const qty = (currentAmount / d.price).toFixed(2);
-    return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ $${d.price.toFixed(2)}</div></div>`;
+    return `<div class="asset">
+      <div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div>
+      <div class="qty">${qty} @ ${fmt(d.price)}</div>
+    </div>`;
   }).join('');
 }
 setInterval(()=>renderInvestGrid(), 30000);
 
 /* ---------- render all ---------- */
 function renderAll(){
-  updateGoalUI();
-  updateImpact();
-  renderHistory();
-  updateAchievements();
-  maybeShowReminder();
+  updateGoalUI(); updateLevelBar(); updateImpact();
+  renderHistory(); updateAchievements(); updateBadges();
+  updateStreakAndReminder();
   drawBarChart(); drawPieChart();
 }
 
@@ -354,7 +450,7 @@ $('save').onclick = async ()=>{
   if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; } else { streak=1; }
   last=String(Date.now()); localStorage.setItem('mm_last', last); localStorage.setItem('mm_streak', streak);
 
-  // AI insights + quote (toast + fade-in)
+  // AI insights + motivational line (toast + fade-in)
   const catAI = classify(note || cat);
   const risk = riskScore(catAI, amt);
   $('aiCategory').textContent = catAI;
@@ -362,28 +458,21 @@ $('save').onclick = async ()=>{
   $('aiImpact').textContent = `${(amt*0.4).toFixed(1)} kg CO₂ avoided`;
   const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
   const quoteEl = $('quote'); quoteEl.textContent = `💡 “${q}”`; quoteEl.classList.add('show'); setTimeout(()=>quoteEl.classList.remove('show'), 4000);
-
   toast(`Saved ${fmt(amt)} 🎉 — “${q}”`);
   confetti();
 
-  renderAll();
-  renderInvestGrid(amt);
+  updateBadges(); renderAll(); renderInvestGrid(amt);
 
-  // history line
   const li=document.createElement('li');
-  li.textContent=`${new Date().toLocaleString()} — Saved ${fmt(amt)} ${cat?'('+cat+')':''}`;
+  li.innerHTML=`${new Date().toLocaleString()} — <strong>${fmt(amt)}</strong> ${cat?'('+cat+')':''}${note?`<div class="muted">${note}</div>`:''}`;
   $('history').prepend(li);
 };
-
-/* ---------- theme ---------- */
-const dark=$('darkToggle');
-dark.onchange=()=>{document.body.classList.toggle('dark',dark.checked); localStorage.setItem('mm_theme',dark.checked?'dark':'light');};
-(function initTheme(){ const t=localStorage.getItem('mm_theme'); if(t==='dark'){dark.checked=true; document.body.classList.add('dark');} })();
 
 /* ---------- init ---------- */
 (function init(){
   renderAll(); renderInvestGrid(25);
 })();
 </script>
+
 </body>
 </html>
