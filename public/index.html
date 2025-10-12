@@ -7,27 +7,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#f0f9ff;--bg2:#e9f5ff;--panel:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;
-    --primary:#2563eb;--ok:#16a34a;--accent:#22c55e;
+    --bg1:#f0f9ff; --bg2:#e9f5ff; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --primary:#2563eb; --ok:#16a34a; --accent:#22c55e; --warn:#ef4444;
   }
   .dark{
-    --bg1:#0b1220;--bg2:#0b1220;--panel:#0f172a;--ink:#e5e7eb;--muted:#94a3b8;--line:#1f2a44;
-    --primary:#4f8cff;--ok:#22c55e;--accent:#22c55e;
+    --bg1:#0b1220; --bg2:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2a44;
+    --primary:#4f8cff; --ok:#22c55e; --accent:#22c55e; --warn:#ef4444;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
-  header{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,var(--primary),var(--accent));
-          color:#fff;padding:14px 20px;box-shadow:0 2px 6px #0003;display:flex;justify-content:space-between;align-items:center}
+  header{
+    position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:linear-gradient(90deg,var(--primary),var(--accent)); color:#fff; padding:14px 20px; box-shadow:0 2px 6px #0003;
+  }
   h1{margin:0;font-size:20px;font-weight:800}
   .toggle{display:flex;gap:8px;align-items:center}
   main{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:24px;max-width:1200px;margin:auto}
   section,aside{background:var(--panel);border-radius:16px;box-shadow:0 2px 8px #0001;padding:16px;border:1px solid var(--line)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   input,select,button{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;background:#fff;color:var(--ink)}
   .dark input,.dark select,.dark button{background:#0f1a2a;color:var(--ink);border-color:#1f2a44}
   button{cursor:pointer}
   .ok{background:var(--ok);color:#fff;border:none}
   .ghost{background:transparent;border:1px dashed var(--line);color:var(--muted)}
-  .metric{background:#fef9c3;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line)}
+  .muted{color:var(--muted)}
+  .metric{background:#fef9c3;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--line}
   .dark .metric{background:#0b2238}
   .metric b{display:block;font-size:12px;color:#a16207}
   .dark .metric b{color:#93c5fd}
@@ -36,15 +40,27 @@
   .dark .barwrap{background:#122036}
   .bar{height:100%;background:linear-gradient(90deg,var(--ok),var(--primary));transition:width .5s}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-  .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);
-         border-radius:12px;padding:10px;background:#fff;transition:opacity .3s ease}
+  .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;transition:opacity .3s}
   .dark .asset{background:#0f172a}
-  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border-radius:12px;padding:10px 14px;
-         font-size:14px;opacity:0;transition:.25s;z-index:10000}
+  .qty{font-weight:800}
+  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
   .toast.show{opacity:1}
   .quote{margin-top:6px;color:#2563eb;font-style:italic;opacity:0;transition:opacity .4s}
   .quote.show{opacity:1}
+  .banner{margin:16px 0;padding:10px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fcd9bd;color:#9a3412;display:flex;justify-content:space-between;align-items:center}
+  .dark .banner{background:#251a00;border-color:#7c5200;color:#ffd89a}
+  /* ring */
+  .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#e2e8f0 0);display:grid;place-items:center;border:2px solid var(--line)}
+  .dark .ring{background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0); border-color:#1f2a44}
+  .ring span{font-size:14px;font-weight:700;color:var(--ink)}
+  /* charts */
+  .chart{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+  .dark .chart{background:#0f172a}
+  .caption{font-size:12px;color:var(--muted);margin-top:4px}
   @media(max-width:900px){main{grid-template-columns:1fr}}
+  /* confetti */
+  .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
 </style>
 </head>
 <body>
@@ -54,132 +70,320 @@
 </header>
 
 <main>
-<section>
-  <h3>Save Instead</h3>
-  <div class="row">
-    <input id="amount" placeholder="I skipped... e.g. 20.00" style="width:140px">
-    <select id="category">
-      <option>Coffee</option><option>Snacks</option><option>Clothes</option>
-      <option>Gadgets</option><option>Rides</option><option>Other</option>
-    </select>
-  </div>
-  <div class="row" style="margin-top:8px">
-    <input id="note" placeholder="Reflection note (optional)" style="flex:1">
-    <button id="save" class="ok">Save Instead</button>
-  </div>
+  <!-- LEFT: Save + AI + Live Investments + History -->
+  <section>
+    <!-- Daily reminder -->
+    <div id="reminder" class="banner" style="display:none;">
+      <span>Don’t forget to log a save today and keep your streak alive! 🔔</span>
+      <button id="dismissRem" class="ghost">Dismiss</button>
+    </div>
 
-  <div class="metric" style="margin-top:12px"><b>Total Saved</b><strong id="mTotal">$0.00</strong></div>
-  <div class="metric" style="margin-top:8px"><b>Goal</b><strong id="goalText">None</strong></div>
-  <div class="barwrap" style="margin-top:4px"><div id="goalBar" class="bar" style="width:0%"></div></div>
-  <div class="metric" style="margin-top:8px"><b>Streak</b><strong id="mStreak">0 days</strong></div>
+    <h3>Save Instead</h3>
+    <div class="row">
+      <input id="amount" placeholder="I skipped... e.g. 20.00" style="width:140px">
+      <select id="category">
+        <option>Coffee</option><option>Snacks</option><option>Clothes</option>
+        <option>Gadgets</option><option>Rides</option><option>Other</option>
+      </select>
+      <input id="customCat" placeholder="Type your category…" style="flex:1; display:none;">
+    </div>
+    <div class="row" style="margin-top:8px">
+      <input id="note" placeholder="(Optional) Why you skipped — reflection helps the habit" style="flex:1">
+      <button id="save" class="ok">Save Instead</button>
+    </div>
 
-  <div id="aiInsights" style="margin-top:16px;background:#f8fafc;border-radius:12px;padding:12px;border:1px solid var(--line)">
-    <strong>AI Insights</strong><br>
-    <div><b>Category:</b> <span id="aiCategory">—</span></div>
-    <div><b>Risk:</b> <span id="aiRisk">—</span></div>
-    <div><b>Impact:</b> <span id="aiImpact">—</span></div>
-    <div class="quote" id="quote"></div>
-  </div>
+    <div class="row" style="margin-top:12px">
+      <div class="metric" style="flex:1"><b>Total Saved</b><strong id="mTotal">$0.00</strong></div>
+      <div class="metric" style="flex:1"><b>Streak</b><strong id="mStreak">0 days</strong></div>
+      <div class="metric" style="flex:1">
+        <b>Goal</b>
+        <div class="row" style="gap:6px;justify-content:center;margin-top:6px">
+          <input id="goalName" placeholder="Name (e.g. Travel Fund)" style="width:160px">
+          <input id="goalIn" type="number" min="1" placeholder="Target" style="width:120px">
+          <button id="gSet" class="ghost">Set</button>
+        </div>
+      </div>
+    </div>
 
-  <div style="margin-top:16px">
-    <h3>With this amount you could buy…</h3>
-    <div id="investGrid" class="grid"></div>
-  </div>
+    <div class="row" style="gap:16px;margin-top:12px;align-items:center">
+      <div class="ring" id="goalRing"><span id="goalPct">0%</span></div>
+      <div style="flex:1">
+        <div class="barwrap"><div id="goalBar" class="bar" style="width:0%"></div></div>
+        <small id="goalText" class="muted">No goal set</small>
+      </div>
+    </div>
 
-  <h3 style="margin-top:16px">History</h3>
-  <ul id="history"></ul>
-</section>
+    <!-- AI Insights -->
+    <div id="aiInsights" style="margin-top:16px;background:#f8fafc;border-radius:12px;padding:12px;border:1px solid var(--line)">
+      <strong>AI Insights</strong><br>
+      <div><b>Category:</b> <span id="aiCategory">—</span></div>
+      <div><b>Risk:</b> <span id="aiRisk">—</span></div>
+      <div><b>Impact:</b> <span id="aiImpact">—</span></div>
+      <div class="quote" id="quote"></div>
+    </div>
 
-<aside>
-  <h3>Your Impact</h3>
-  <div class="metric"><b>CO₂ Avoided</b><strong id="ecoText">0 kg</strong></div>
-  <div class="barwrap"><div id="ecoBar" class="bar" style="width:0%"></div></div>
-  <div class="metric" style="margin-top:10px"><b>Community Goal</b><strong id="commText">0%</strong></div>
-  <div class="barwrap"><div id="commBar" class="bar" style="width:0%"></div></div>
-</aside>
+    <!-- Live Investments -->
+    <div style="margin-top:16px">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h3 style="margin:0">With this amount you could buy…</h3>
+        <button id="refreshInvest" class="ghost">Refresh</button>
+      </div>
+      <div id="investGrid" class="grid" style="margin-top:8px"></div>
+      <small class="muted">Live prices via your backend (`/api/quotes`).</small>
+    </div>
+
+    <h3 style="margin-top:18px">History</h3>
+    <ul id="history"></ul>
+  </section>
+
+  <!-- RIGHT: Impact + Achievements + Charts -->
+  <aside>
+    <h3>Your Impact</h3>
+    <div class="metric"><b>CO₂ Avoided</b><strong id="ecoText">0 kg</strong></div>
+    <div class="barwrap"><div id="ecoBar" class="bar" style="width:0%"></div></div>
+
+    <div class="metric" style="margin-top:10px"><b>Community Goal</b><strong id="commText">0%</strong></div>
+    <div class="barwrap"><div id="commBar" class="bar" style="width:0%"></div></div>
+
+    <h3 style="margin-top:16px">Mini Achievements</h3>
+    <ul id="achievements" class="muted">
+      <li id="achWeek">— Save 5× this week</li>
+      <li id="achTotal">— Save 10× overall</li>
+    </ul>
+
+    <h3 style="margin-top:16px">Insights</h3>
+    <div class="chart">
+      <svg id="barChart" width="100%" height="170"></svg>
+      <div class="caption">$ Saved by Category (this month)</div>
+    </div>
+    <div class="chart" style="margin-top:8px">
+      <svg id="pieChart" width="100%" height="170"></svg>
+      <div class="caption">Category Distribution</div>
+    </div>
+    <div class="row" style="gap:8px;margin-top:8px">
+      <div class="metric" style="flex:1"><b>Best Day</b><strong id="bestDay">—</strong></div>
+      <div class="metric" style="flex:1"><b>Top Category</b><strong id="topCat">—</strong></div>
+    </div>
+  </aside>
 </main>
 
 <div id="toast" class="toast"></div>
 
 <script>
-const $=id=>document.getElementById(id);
-const QUOTES=[
- "Small wins add up fast.",
- "You just paid your future self.",
- "Skip a treat, grow a streak.",
- "Save today, thank yourself tomorrow.",
- "Consistency beats intensity.",
- "Purpose beats impulse."
+/* ---------- helpers & state ---------- */
+const $ = id => document.getElementById(id);
+const QUOTES = [
+ "Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.",
+ "Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."
 ];
+function fmt(n){ return '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function ymd(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]'); // {ts, amt, cat?, note?}
+let goal = +localStorage.getItem('mm_goal') || 0;
+let goalName = localStorage.getItem('mm_goal_name') || '';
+let streak = +localStorage.getItem('mm_streak') || 0;
+let last = localStorage.getItem('mm_last') || null;
+let dismissedReminder = localStorage.getItem('mm_rem_dismiss') === '1';
+let communityTotal = 25000; const COMMUNITY_GOAL = 100000;
 
-let hist=JSON.parse(localStorage.getItem('mm_hist')||'[]');
-let goal=+localStorage.getItem('mm_goal')||100;
-let streak=+localStorage.getItem('mm_streak')||0;
-let last=localStorage.getItem('mm_last')||null;
-let communityTotal=25000;
-const COMMUNITY_GOAL=100000;
+/* ---------- UI feedback ---------- */
+let toastTimer=null;
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500); }
+function confetti(n=140){ const colors=['#22c55e','#2563eb','#f59e0b','#ef4444','#a855f7']; for(let i=0;i<n;i++){ const el=document.createElement('div'); el.className='confetti'; el.style.left=Math.random()*100+'vw'; el.style.background=colors[i%colors.length]; el.style.transform='rotate('+(Math.random()*360)+'deg)'; el.style.animationDelay=(Math.random()*0.3)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),2000); }}
 
-function fmt(n){return '$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
-function totalSaved(){return hist.reduce((s,h)=>s+Number(h.amt||0),0);}
-function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function classify(txt){const map={coffee:'Coffee',snack:'Snacks',shirt:'Clothes',gadget:'Gadgets',ride:'Rides'};txt=txt.toLowerCase();for(const k in map){if(txt.includes(k))return map[k];}return'Other';}
-function riskScore(cat,amt){const hour=new Date().getHours();const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1;const late=(hour>=22||hour<=5)?2:0;const price=Math.min(amt/20,4);return Math.max(1,Math.min(10,Math.round(base+late+price)));}
+/* ---------- AI helpers ---------- */
+function classify(text){ const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in map){ if(text.includes(k)) return map[k]; } return 'Other'; }
+function riskScore(cat,amt){ const hour=new Date().getHours(); const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1; const late=(hour>=22||hour<=5)?2:0; const price=Math.min(amt/20,4); return Math.max(1,Math.min(10,Math.round(base+late+price))); }
 
-function updateUI(){
- const s=totalSaved();
- const pct=Math.min(100,Math.round(s/goal*100));
- $('mTotal').textContent=fmt(s);
- $('goalText').textContent=`${fmt(goal)} target`;
- $('goalBar').style.width=pct+'%';
- $('mStreak').textContent=streak+' days';
- const eco=s*0.4;$('ecoText').textContent=eco.toFixed(1)+' kg';$('ecoBar').style.width=Math.min(100,eco/400*100)+'%';
- const comm=Math.min(100,((communityTotal+s)/COMMUNITY_GOAL)*100);$('commText').textContent=comm.toFixed(1)+'%';$('commBar').style.width=comm+'%';
- const ul=$('history');ul.innerHTML='';hist.slice().reverse().forEach(h=>{const li=document.createElement('li');li.textContent=`${new Date(h.ts).toLocaleString()} — ${fmt(h.amt)} (${h.cat})`;ul.appendChild(li);});
+/* ---------- aggregates ---------- */
+function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
+function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
+function bestDay(){ const by={}; hist.forEach(h=>{ const d=new Date(h.ts).toLocaleDateString(); by[d]=(by[d]||0)+h.amt; }); let m=0,k='—'; Object.entries(by).forEach(([d,v])=>{ if(v>m){m=v;k=d} }); return k; }
+function topCategory(){ const by={}; hist.forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; }); let m=0,k='—'; Object.entries(by).forEach(([c,v])=>{ if(v>m){m=v;k=c} }); return k; }
+
+/* ---------- goal & rings ---------- */
+function updateGoalUI(){
+  const s = totalSaved();
+  const pct = goal ? Math.min(100, Math.round(s/goal*100)) : 0;
+  $('goalPct').textContent = pct + '%';
+  $('goalBar').style.width = pct + '%';
+  $('goalRing').style.setProperty('--p', pct);
+  $('goalText').textContent = goal ? `${goalName? goalName+' • ':''}${fmt(goal)} target` : 'No goal set';
 }
 
+/* ---------- eco & community ---------- */
+function updateImpact(){
+  const eco = totalSaved()*0.4; // ~kg CO2
+  $('ecoText').textContent = eco.toFixed(1) + ' kg';
+  $('ecoBar').style.width = Math.min(100, (eco/400)*100) + '%';
+  const commPct = Math.min(100, (((communityTotal + totalSaved())/COMMUNITY_GOAL)*100));
+  $('commText').textContent = commPct.toFixed(1) + '%';
+  $('commBar').style.width = commPct + '%';
+}
+
+/* ---------- history ---------- */
+function renderHistory(){
+  const ul = $('history'); ul.innerHTML = '';
+  hist.slice().reverse().slice(0,30).forEach(h=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="row" style="justify-content:space-between;width:100%">
+      <span>${new Date(h.ts).toLocaleString()}</span>
+      <span><strong>${fmt(h.amt)}</strong> <small class="muted">${h.cat || ''}</small></span>
+    </div>${h.note?`<div class="muted">${h.note}</div>`:''}`;
+    ul.appendChild(li);
+  });
+}
+
+/* ---------- achievements ---------- */
+function weekSavesCount(){
+  const weekAgo = Date.now() - 7*864e5;
+  return hist.filter(h=> h.ts >= weekAgo).length;
+}
+function updateAchievements(){
+  const w = weekSavesCount();
+  const t = hist.length;
+  $('achWeek').textContent = (w>=5 ? '✅ Saved 5× this week' : `— Save 5× this week (${w}/5)`);
+  $('achTotal').textContent = (t>=10 ? '✅ Saved 10× overall' : `— Save 10× overall (${t}/10)`);
+}
+
+/* ---------- reminder ---------- */
+function maybeShowReminder(){
+  if (dismissedReminder) { $('reminder').style.display='none'; return; }
+  if (!last) { $('reminder').style.display='block'; return; }
+  const lastMs = +last;
+  $('reminder').style.display = (Date.now() - lastMs > 24*3600*1000) ? 'block' : 'none';
+}
+
+/* ---------- charts (SVG) ---------- */
+function drawBarChart(){
+  const svg=$('barChart'); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; });
+  const cats=Object.keys(by); const vals=Object.values(by);
+  if(!cats.length){ svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>'; return; }
+  const w=svg.clientWidth||300, h=svg.clientHeight||170, pad=28, max=Math.max(...vals,10);
+  cats.forEach((k,i)=>{
+    const bw=(w-pad*2)/cats.length-8;
+    const x=pad+i*((w-pad*2)/cats.length);
+    const bh=(h-pad*2)*(by[k]/max);
+    const y=h-pad-bh;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',bh);
+    r.setAttribute('fill','#22c55e'); r.setAttribute('rx','4'); svg.appendChild(r);
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',x+bw/2); lbl.setAttribute('y',h-8); lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('fill','#64748b'); lbl.setAttribute('font-size','11'); lbl.textContent=k; svg.appendChild(lbl);
+  });
+}
+function drawPieChart(){
+  const svg=$('pieChart'); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; });
+  const entries=Object.entries(by); if(!entries.length){ svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>'; return; }
+  const w=svg.clientWidth||300, h=svg.clientHeight||170, cx=w/2, cy=h/2, r=Math.min(w,h)/3;
+  const sum=entries.reduce((a,[,v])=>a+v,0); let a0=0; const colors=['#2563eb','#22c55e','#f59e0b','#ef4444','#a855f7'];
+  entries.forEach(([k,v],i)=>{
+    const a1=a0+2*Math.PI*(v/sum);
+    const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0);
+    const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+    const large=a1-a0>Math.PI?1:0;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`);
+    p.setAttribute('fill',colors[i%colors.length]); svg.appendChild(p);
+    a0=a1;
+  });
+}
+
+/* ---------- investments (live) ---------- */
+const ASSETS = ['AAPL','MSFT','AMZN','TSLA','VOO','VTI','QQQ','ICLN','BTC-USD','XAU/USD','XAG/USD'];
 async function getQuotes(symbols){
- try{const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(',')));
- const j=await r.json();return j.data||[];}catch(e){return[];}
+  try{ const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(','))); const j=await r.json(); return j.data||[]; }
+  catch(e){ return []; }
 }
-async function renderInvestGrid(amt){
- const grid=$('investGrid');const syms=['AAPL','MSFT','VOO','VTI','BTC-USD','XAU/USD','XAG/USD'];
- const data=await getQuotes(syms);
- grid.innerHTML=data.filter(d=>d&&d.price).map(d=>{
-  const qty=(amt/d.price).toFixed(2);
-  return `<div class="asset"><strong>${d.symbol}</strong><div>${qty} @ $${d.price.toFixed(2)}</div></div>`;
- }).join('');
+let currentAmount = 25;
+async function renderInvestGrid(amount){
+  currentAmount = amount || currentAmount || 25;
+  const grid = $('investGrid');
+  const data = await getQuotes(ASSETS);
+  grid.innerHTML = data.filter(d=>d && d.price).map(d=>{
+    const qty = (currentAmount / d.price).toFixed(2);
+    return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ $${d.price.toFixed(2)}</div></div>`;
+  }).join('');
+}
+setInterval(()=>renderInvestGrid(), 30000);
+
+/* ---------- render all ---------- */
+function renderAll(){
+  updateGoalUI();
+  updateImpact();
+  renderHistory();
+  updateAchievements();
+  maybeShowReminder();
+  drawBarChart(); drawPieChart();
 }
 
-$('save').onclick=async()=>{
- const raw=$('amount').value.replace(/[^0-9.]/g,'');
- const amt=parseFloat(raw||'0');if(!amt){toast('Enter amount');return;}
- const cat=$('category').value;const note=$('note').value.trim();
- hist.push({ts:Date.now(),amt,cat,note});localStorage.setItem('mm_hist',JSON.stringify(hist));
+/* ---------- events ---------- */
+$('category').addEventListener('change', e=>{
+  $('customCat').style.display = (e.target.value === 'Other') ? 'block' : 'none';
+});
+$('dismissRem').onclick = ()=>{ dismissedReminder = true; localStorage.setItem('mm_rem_dismiss','1'); $('reminder').style.display='none'; };
 
- // streak
- const today=ymd(new Date()),lastDay=last?ymd(new Date(+last)):null;
- if(lastDay===today){}else if(lastDay&&ymd(new Date(Date.now()-864e5))===lastDay){streak++;}else{streak=1;}
- last=String(Date.now());localStorage.setItem('mm_last',last);localStorage.setItem('mm_streak',streak);
-
- // AI insight + quote
- const catAI=classify(note||cat);const risk=riskScore(catAI,amt);
- $('aiCategory').textContent=catAI;
- $('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`;
- $('aiImpact').textContent=`${(amt*0.4).toFixed(1)} kg CO₂ avoided`;
- const q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
- $('quote').textContent=`💡 “${q}”`;$('quote').classList.add('show');setTimeout(()=>$('quote').classList.remove('show'),4000);
- toast(`Saved ${fmt(amt)} 🎉 — “${q}”`);
-
- updateUI();renderInvestGrid(amt);
+$('gSet').onclick = ()=>{
+  const name = $('goalName').value.trim();
+  const g = +($('goalIn').value || 0);
+  if (!g) { toast('Enter a target'); return; }
+  goal = g; goalName = name;
+  localStorage.setItem('mm_goal', goal);
+  localStorage.setItem('mm_goal_name', goalName);
+  toast('Goal set 🎯'); updateGoalUI();
 };
 
-const dark=$('darkToggle');
-dark.onchange=()=>{document.body.classList.toggle('dark',dark.checked);
- localStorage.setItem('mm_theme',dark.checked?'dark':'light');};
-if(localStorage.getItem('mm_theme')==='dark'){dark.checked=true;document.body.classList.add('dark');}
+$('refreshInvest').onclick = ()=> {
+  const raw = $('amount').value.replace(/[^0-9.]/g,''); const amt = parseFloat(raw||'0') || 25;
+  renderInvestGrid(amt);
+};
 
-updateUI();renderInvestGrid(25);
+$('save').onclick = async ()=>{
+  const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt){toast('Enter amount');return;}
+  let cat=$('category').value||'Other'; if(cat==='Other'){ const custom=$('customCat').value.trim(); if(custom) cat=custom; }
+  const note=$('note').value.trim();
+
+  hist.push({ ts: Date.now(), amt, cat, note });
+  localStorage.setItem('mm_hist', JSON.stringify(hist));
+
+  // streak
+  const today=ymd(new Date()); const lastDay=last?ymd(new Date(+last)):null;
+  if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; } else { streak=1; }
+  last=String(Date.now()); localStorage.setItem('mm_last', last); localStorage.setItem('mm_streak', streak);
+
+  // AI insights + quote (toast + fade-in)
+  const catAI = classify(note || cat);
+  const risk = riskScore(catAI, amt);
+  $('aiCategory').textContent = catAI;
+  $('aiRisk').textContent = `${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`;
+  $('aiImpact').textContent = `${(amt*0.4).toFixed(1)} kg CO₂ avoided`;
+  const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
+  const quoteEl = $('quote'); quoteEl.textContent = `💡 “${q}”`; quoteEl.classList.add('show'); setTimeout(()=>quoteEl.classList.remove('show'), 4000);
+
+  toast(`Saved ${fmt(amt)} 🎉 — “${q}”`);
+  confetti();
+
+  renderAll();
+  renderInvestGrid(amt);
+
+  // history line
+  const li=document.createElement('li');
+  li.textContent=`${new Date().toLocaleString()} — Saved ${fmt(amt)} ${cat?'('+cat+')':''}`;
+  $('history').prepend(li);
+};
+
+/* ---------- theme ---------- */
+const dark=$('darkToggle');
+dark.onchange=()=>{document.body.classList.toggle('dark',dark.checked); localStorage.setItem('mm_theme',dark.checked?'dark':'light');};
+(function initTheme(){ const t=localStorage.getItem('mm_theme'); if(t==='dark'){dark.checked=true; document.body.classList.add('dark');} })();
+
+/* ---------- init ---------- */
+(function init(){
+  renderAll(); renderInvestGrid(25);
+})();
 </script>
 </body>
 </html>
