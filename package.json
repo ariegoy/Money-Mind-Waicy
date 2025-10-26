@@ -1,7 +1,7 @@
 {
   "name": "money-mind",
   "version": "1.0.0",
-  "description": "Money Mind backend for Render",
+  "description": "Money Mind — Save Instead (CAC build with hardware features)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
