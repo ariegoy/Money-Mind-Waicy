@@ -292,6 +292,63 @@ function renderAll(){ $('mTotal').textContent=fmt(totalSaved()); $('mStreak').te
 
 /* init */
 (function init(){ $('currency').value=localStorage.getItem('mm_cur')||'USD'; renderAll(); renderInvestGrid(totalSaved()); })();
+/* --- Smart Scan (camera price / receipt reflection) --- */
+(function(){
+  const el=document.createElement("script");
+  el.src="https://unpkg.com/html5-qrcode";
+  document.head.appendChild(el);
+  el.onload=()=>{
+    const qr=new Html5Qrcode("camera");
+    let scanning=false;
+    const avg={coffee:5,tshirt:20,headphones:60,pizza:15};
+    const cam=document.createElement("div");
+    cam.innerHTML=`
+      <div id="camera" style="width:100%;max-width:320px;border:1px solid #1f2a44;border-radius:12px;margin-top:12px"></div>
+      <div class="row" style="margin-top:6px;">
+        <button id="scanStart" class="ok">📷 Smart Scan</button>
+        <button id="scanStop" class="ghost">Stop</button>
+      </div>
+      <small id="scanMsg" class="muted">Scan a product tag or receipt QR to compare prices.</small>`;
+    document.querySelector("aside").prepend(cam);
+
+    function msg(t){document.getElementById("scanMsg").innerHTML=t;}
+    function start(){
+      if(scanning)return;
+      scanning=true; msg("Scanning… point at a price tag or receipt.");
+      qr.start({facingMode:"environment"},{fps:10,qrbox:250},txt=>handle(txt),()=>{})
+        .catch(e=>{msg("Camera error: "+e);scanning=false;});
+    }
+    function stop(){
+      if(!scanning)return;
+      qr.stop().then(()=>{scanning=false;msg("Scanner stopped.");});
+    }
+    function handle(t){
+      const lower=t.toLowerCase();
+      for(const k in avg){
+        if(lower.includes(k)){
+          const a=avg[k];
+          const cur=parseFloat(t.replace(/[^0-9.]/g,''))||a;
+          if(cur>a){
+            msg(`That ${k} costs $${cur}. Avg ≈ $${a}. <b>Maybe Save Instead?</b>`);
+            $('amount').value=cur.toFixed(2);
+            $('note').value=`Skipped expensive ${k}`;
+          }else msg(`Good deal on ${k} at $${cur}!`);
+          return;
+        }
+      }
+      const n=parseFloat(t.replace(/[^0-9.]/g,''));
+      if(n>0){
+        msg(`Receipt total $${n}. Reflect and consider saving next time.`);
+        $('amount').value=n.toFixed(2);
+        $('note').value="Reflective receipt scan";
+      }else msg("Couldn’t recognize item — try another QR.");
+    }
+    document.addEventListener("click",e=>{
+      if(e.target.id==="scanStart")start();
+      if(e.target.id==="scanStop")stop();
+    });
+  };
+})();
 </script>
 </body>
 </html>
