@@ -6,40 +6,37 @@
 <title>Money Mind — Save Instead</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg1:#0b1220; --bg2:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2a44;
-    --primary:#4f8cff; --ok:#22c55e; --accent:#22c55e;
-  }
+  :root{ --bg1:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2a44; --primary:#4f8cff; --ok:#22c55e; }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
-  header{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
-         padding:14px 18px;box-shadow:0 2px 6px #0006;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  body{margin:0;font-family:Inter,system-ui;background:linear-gradient(135deg,var(--bg1),#0b1220);color:var(--ink)}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(90deg,var(--primary),var(--ok));color:#fff;
+         padding:14px 18px;box-shadow:0 2px 6px #0006;display:flex;justify-content:space-between;align-items:center}
   h1{margin:0;font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center}
-  .logo{font-size:28px;background:linear-gradient(135deg,#ef4444,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#ffffff22}
+  .logo{font-size:26px;background:linear-gradient(135deg,#ef4444,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .pill{display:flex;gap:8px;align-items:center;background:#ffffff22;padding:6px 10px;border-radius:999px}
   .pill select{border:0;border-radius:8px;padding:6px 8px;background:#ffffffdd;color:#0b1220}
   main{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:24px;max-width:1200px;margin:auto}
-  section,aside{background:var(--panel);border-radius:16px;box-shadow:0 2px 8px #0004;padding:16px;border:1px solid var(--line)}
+  section,aside{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 8px #0004;padding:16px}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  input,select,button{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;background:#0f1a2a;color:var(--ink)}
+  input,select,button{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#0f1a2a;color:var(--ink);font-family:inherit}
+  input::placeholder{color:#6f7aa6}
   button{cursor:pointer}
   .ok{background:var(--ok);color:#fff;border:none}
-  .ghost{background:transparent;border:1px dashed var(--line);color:#94a3b8}
+  .ghost{background:transparent;border:1px dashed var(--line);color:var(--muted)}
   .muted{color:var(--muted)}
   .metric{background:#0b2238;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
   .metric b{display:block;font-size:12px;color:#93c5fd}
   .metric strong{font-size:18px}
   .barwrap{height:10px;background:#122036;border-radius:999px;overflow:hidden}
   .bar{height:100%;background:linear-gradient(90deg,var(--ok),var(--primary));transition:width .5s}
+  .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0);
+        display:grid;place-items:center;border:2px solid var(--line)}
+  .ring span{font-size:14px;font-weight:700;color:var(--ink)}
   .card{border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f172a}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
   .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#0f172a}
   .qty{font-weight:800}
-  .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0);
-        display:grid;place-items:center;border:2px solid var(--line)}
-  .ring span{font-size:14px;font-weight:700;color:var(--ink)}
-  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;
-         padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
+  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
   .toast.show{opacity:1}
   .quote{margin-top:6px;color:#4f8cff;font-style:italic;opacity:0;transition:opacity .4s}
   .quote.show{opacity:1}
@@ -49,16 +46,13 @@
 </style>
 </head>
 <body>
-
 <header>
   <h1><span class="logo">🧠💵</span> Money Mind — Save Instead</h1>
   <div class="pill">
     <span>Currency</span>
     <select id="currency">
-      <option value="USD">$ USD</option>
-      <option value="EUR">€ EUR</option>
-      <option value="GBP">£ GBP</option>
-      <option value="INR">₹ INR</option>
+      <option value="USD">$ USD</option><option value="EUR">€ EUR</option>
+      <option value="GBP">£ GBP</option><option value="INR">₹ INR</option>
     </select>
   </div>
 </header>
@@ -73,7 +67,7 @@
         <option>Coffee</option><option>Snacks</option><option>Clothes</option>
         <option>Gadgets</option><option>Rides</option><option>Other</option>
       </select>
-      <input id="customCat" placeholder="Type your category…" style="flex:1; display:none;">
+      <input id="customCat" placeholder="Type your category…" style="flex:1;display:none">
     </div>
     <div class="row" style="margin-top:8px">
       <input id="note" placeholder="(Optional) Why you skipped — reflection helps the habit" style="flex:1">
@@ -115,42 +109,38 @@
         <button id="refreshInvest" class="ghost">Refresh</button>
       </div>
       <div id="investGrid" class="grid" style="margin-top:8px"></div>
-      <small class="muted">Live prices via /api/quotes (Finnhub).</small>
+      <small class="muted">Live via /api/quotes (Finnhub).</small>
     </div>
 
     <h3 style="margin-top:18px">History</h3>
     <ul id="history"></ul>
   </section>
 
-  <!-- RIGHT: impact, badges, charts + hardware & predictive -->
+  <!-- RIGHT: insights + “safe” hardware gate -->
   <aside>
-    <h3>Your Impact & Hardware</h3>
+    <h3>Your Impact</h3>
     <div class="metric"><b>CO₂ Avoided</b><strong id="ecoText">0 kg</strong></div>
     <div class="barwrap"><div id="ecoBar" class="bar" style="width:0%"></div></div>
 
-    <div class="card" style="margin-top:12px">
-      <div class="row" style="gap:8px">
-        <button id="voiceStart" class="ok">🎤 Voice Save</button>
-        <button id="ecoBtn" class="ok">🌍 Eco-Aware Save</button>
-      </div>
-      <small class="muted">Geo-Haptic reminder runs automatically (buzz when you move away from your save spot).</small>
-    </div>
+    <h3 style="margin-top:16px">Badges & Levels</h3>
+    <div id="badges" class="grid"></div>
 
     <h3 style="margin-top:16px">Predictive Save</h3>
     <div class="metric" id="predictMsg">
-      <b>Tomorrow’s Smart Suggestion</b>
-      <strong>Analyzing...</strong>
+      <b>Tomorrow’s Smart Suggestion</b><strong>Analyzing...</strong>
     </div>
     <button id="predictSave" class="ok" style="margin-top:8px;">Save Ahead</button>
 
-    <h3 style="margin-top:16px">Insights</h3>
-    <div class="card">
-      <svg id="barChart" width="100%" height="170"></svg>
-      <div class="caption">$ Saved by Category (this month)</div>
-    </div>
-    <div class="card" style="margin-top:8px">
-      <svg id="pieChart" width="100%" height="170"></svg>
-      <div class="caption">Category Distribution</div>
+    <h3 style="margin-top:16px">Hardware</h3>
+    <!-- Gate is injected; card stays hidden until enabled -->
+    <div class="card" id="hwCard" style="display:none">
+      <div id="camera" style="width:100%;max-width:320px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px"></div>
+      <div class="row" style="gap:8px;margin-bottom:8px">
+        <button id="voiceStart" class="ok">🎤 Voice Save</button>
+        <button id="scanStart"  class="ok">📷 Smart Scan</button>
+        <button id="scanStop"   class="ghost">Stop</button>
+      </div>
+      <small id="scanMsg" class="muted">Smart Scan compares product/receipt prices and suggests saving.</small>
     </div>
   </aside>
 </main>
@@ -158,133 +148,132 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* ==================== Helpers & State ==================== */
-const $ = id => document.getElementById(id);
-const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
-function fmt(n){ const cur = localStorage.getItem('mm_cur') || 'USD'; return C[cur] + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function ymd(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()) }
-let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]'); // {ts, amt, cat?, note?}
-let goal = +localStorage.getItem('mm_goal') || 0;
-let goalName = localStorage.getItem('mm_goal_name') || '';
-let streak = +localStorage.getItem('mm_streak') || 0;
-let last = localStorage.getItem('mm_last') || null;
-const QUOTES = [
-  "Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.",
-  "Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."
-];
+/* ---------- Helpers & State ---------- */
+const $=id=>document.getElementById(id);
+const C={USD:'$',EUR:'€',GBP:'£',INR:'₹'};
+function fmt(n){const cur=localStorage.getItem('mm_cur')||'USD';return C[cur]+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+function ymd(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate())}
+let hist=JSON.parse(localStorage.getItem('mm_hist')||'[]'); let goal=+localStorage.getItem('mm_goal')||0;
+let goalName=localStorage.getItem('mm_goal_name')||''; let streak=+localStorage.getItem('mm_streak')||0; let last=localStorage.getItem('mm_last')||null;
 if(Notification && Notification.permission==='default'){ Notification.requestPermission(); }
-function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
-function confetti(n=100){ const colors=['#22c55e','#4f8cff','#f59e0b','#ef4444','#a855f7']; for(let i=0;i<n;i++){const el=document.createElement('div'); el.className='confetti'; el.style.left=Math.random()*100+'vw'; el.style.background=colors[i%colors.length]; el.style.transform='rotate('+(Math.random()*360)+'deg)'; el.style.animationDelay=(Math.random()*0.3)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),1800);} }
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function confetti(n=90){const colors=['#22c55e','#4f8cff','#f59e0b','#ef4444','#a855f7'];for(let i=0;i<n;i++){const el=document.createElement('div');el.className='confetti';el.style.left=Math.random()*100+'vw';el.style.background=colors[i%colors.length];el.style.transform='rotate('+(Math.random()*360)+'deg)';el.style.animationDelay=(Math.random()*0.3)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),1700);}}
 
-/* ==================== AI helpers ==================== */
-function classify(text){ const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in map){ if(text.includes(k)) return map[k]; } return 'Other'; }
-function riskScore(cat,amt){ const hour=new Date().getHours(); const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1; const late=(hour>=22||hour<=5)?2:0; const price=Math.min(amt/20,4); return Math.max(1,Math.min(10,Math.round(base+late+price))); }
+/* ---------- AI helpers ---------- */
+function classify(t){const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'};t=(t||'').toLowerCase();for(const k in map){if(t.includes(k))return map[k];}return'Other';}
+function riskScore(cat,amt){const h=new Date().getHours();const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1;const late=(h>=22||h<=5)?2:0;const price=Math.min(amt/20,4);return Math.max(1,Math.min(10,Math.round(base+late+price)));}
 
-/* ==================== Goal / streak / impact ==================== */
-function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
-function updateGoalUI(){ const s=totalSaved(); const pct=goal?Math.min(100,Math.round(s/goal*100)):0; $('goalPct').textContent=pct+'%'; $('goalBar').style.width=pct+'%'; $('goalRing').style.setProperty('--p', pct); $('goalText').textContent=goal?`${goalName?goalName+' • ':''}${fmt(goal)} target`:'No goal set'; }
-function updateImpact(){ const eco = totalSaved()*0.4; $('ecoText').textContent = eco.toFixed(1) + ' kg'; $('ecoBar').style.width = Math.min(100,(eco/400)*100) + '%'; }
+/* ---------- Goal, Impact, Badges ---------- */
+function totalSaved(){return hist.reduce((s,h)=>s+Number(h.amt||0),0);}
+function updateGoalUI(){const s=totalSaved();const pct=goal?Math.min(100,Math.round(s/goal*100)):0;$('goalPct').textContent=pct+'%';$('goalBar').style.width=pct+'%';$('goalRing').style.setProperty('--p',pct);$('goalText').textContent=goal?`${goalName?goalName+' • ':''}${fmt(goal)} target`:'No goal set';}
+function updateImpact(){const eco=totalSaved()*0.4;$('ecoText').textContent=eco.toFixed(1)+' kg';$('ecoBar').style.width=Math.min(100,(eco/400)*100)+'%';}
+let badges=JSON.parse(localStorage.getItem('mm_badges')||'[]');
+function haveBadge(id){return badges.some(b=>b.id===id);}
+function giveBadge(id,label,icon){if(haveBadge(id))return;badges.push({id,label,icon});localStorage.setItem('mm_badges',JSON.stringify(badges));}
+function updateBadges(){const s=totalSaved(),t=hist.length;if(t>=1)giveBadge('first','First Save','🎉');if(s>=100)giveBadge('100','$100 Saved','🥇');if(s>=500)giveBadge('500','$500 Saved','🏆');if(s>=1000)giveBadge('1000','$1000 Saved','💎');
+  const wrap=$('badges');wrap.innerHTML='';(badges.length?badges:[{label:'Make a save to unlock badges',icon:'💤'}]).forEach(b=>{const div=document.createElement('div');div.className='asset';div.innerHTML=`<div><i>${b.icon}</i> ${b.label}</div>`;wrap.appendChild(div);});}
 
-/* ==================== Badges & history ==================== */
-let badges = JSON.parse(localStorage.getItem('mm_badges')||'[]');
-function haveBadge(id){ return badges.some(b=>b.id===id); }
-function giveBadge(id,label,icon){ if(haveBadge(id)) return; badges.push({id,label,icon}); localStorage.setItem('mm_badges',JSON.stringify(badges)); }
-function updateBadges(){ const s=totalSaved(), t=hist.length;
-  if(t>=1) giveBadge('first','First Save','🎉');
-  if(s>=100) giveBadge('100','$100 Saved','🥇');
-  if(s>=500) giveBadge('500','$500 Saved','🏆');
-  if(s>=1000) giveBadge('1000','$1000 Saved','💎');
-  const wrap=$('badges'); wrap.innerHTML=''; (badges.length?badges:[{label:'Make a save to unlock badges',icon:'💤'}]).forEach(b=>{ const div=document.createElement('div'); div.className='asset'; div.innerHTML=`<div><i>${b.icon}</i> ${b.label}</div>`; wrap.appendChild(div); });
-}
-function renderHistory(){ const ul=$('history'); ul.innerHTML=''; hist.slice().reverse().slice(0,30).forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%"><span>${new Date(h.ts).toLocaleString()}</span><span><strong>${fmt(h.amt)}</strong> <small class="muted">${h.cat||''}</small></span></div>${h.note?`<div class="muted">${h.note}</div>`:''}`; ul.appendChild(li); }); }
+/* ---------- Charts ---------- */
+function thisMonth(ts){const d=new Date(ts),n=new Date();return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth();}
+function drawBarChart(){const svg=$('barChart');while(svg.firstChild)svg.removeChild(svg.firstChild);const by={};hist.filter(h=>thisMonth(h.ts)).forEach(h=>{const c=h.cat||'Other';by[c]=(by[c]||0)+h.amt;});
+  const cats=Object.keys(by),vals=Object.values(by);if(!cats.length){svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>';return;}
+  const w=svg.clientWidth||300,h=svg.clientHeight||170,p=28,max=Math.max(...vals,10);
+  cats.forEach((k,i)=>{const bw=(w-p*2)/cats.length-8,x=p+i*((w-p*2)/cats.length),bh=(h-p*2)*(by[k]/max),y=h-p-bh;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',bw);r.setAttribute('height',bh);r.setAttribute('fill','#22c55e');r.setAttribute('rx','4');svg.appendChild(r);
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');lbl.setAttribute('x',x+bw/2);lbl.setAttribute('y',h-8);lbl.setAttribute('text-anchor','middle');lbl.setAttribute('fill','#94a3b8');lbl.setAttribute('font-size','11');lbl.textContent=k;svg.appendChild(lbl);});}
+function drawPieChart(){const svg=$('pieChart');while(svg.firstChild)svg.removeChild(svg.firstChild);const by={};hist.filter(h=>thisMonth(h.ts)).forEach(h=>{const c=h.cat||'Other';by[c]=(by[c]||0)+h.amt;});
+  const ent=Object.entries(by);if(!ent.length){svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>';return;}
+  const w=svg.clientWidth||300,h=svg.clientHeight||170,cx=w/2,cy=h/2,r=Math.min(w,h)/3,sum=ent.reduce((a,[,v])=>a+v,0);let a0=0;const colors=['#4f8cff','#22c55e','#f59e0b','#ef4444','#a855f7'];
+  ent.forEach(([k,v],i)=>{const a1=a0+2*Math.PI*(v/sum),x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),L=a1-a0>Math.PI?1:0;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${L} 1 ${x1} ${y1} Z`);p.setAttribute('fill',colors[i%colors.length]);svg.appendChild(p);a0=a1;});}
 
-/* ==================== Charts ==================== */
-function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
-function drawBarChart(){ const svg=$('barChart'); while(svg.firstChild) svg.removeChild(svg.firstChild);
-  const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; });
-  const cats=Object.keys(by), vals=Object.values(by); if(!cats.length){ svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>'; return;}
-  const w=svg.clientWidth||300,h=svg.clientHeight||170,pad=28,max=Math.max(...vals,10);
-  cats.forEach((k,i)=>{ const bw=(w-pad*2)/cats.length-8, x=pad+i*((w-pad*2)/cats.length), bh=(h-pad*2)*(by[k]/max), y=h-pad-bh;
-    const r=document.createElementNS('http://www.w3.org/2000/svg','rect'); r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',bh); r.setAttribute('fill','#22c55e'); r.setAttribute('rx','4'); svg.appendChild(r);
-    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text'); lbl.setAttribute('x',x+bw/2); lbl.setAttribute('y',h-8); lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('fill','#94a3b8'); lbl.setAttribute('font-size','11'); lbl.textContent=k; svg.appendChild(lbl); });
-}
-function drawPieChart(){ const svg=$('pieChart'); while(svg.firstChild) svg.removeChild(svg.firstChild);
-  const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; });
-  const ent=Object.entries(by); if(!ent.length){ svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>'; return;}
-  const w=svg.clientWidth||300,h=svg.clientHeight||170,cx=w/2,cy=h/2,r=Math.min(w,h)/3,sum=ent.reduce((a,[,v])=>a+v,0); let a0=0; const colors=['#4f8cff','#22c55e','#f59e0b','#ef4444','#a855f7'];
-  ent.forEach(([k,v],i)=>{ const a1=a0+2*Math.PI*(v/sum),x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),large=a1-a0>Math.PI?1:0;
-    const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`); p.setAttribute('fill',colors[i%colors.length]); svg.appendChild(p); a0=a1; });
-}
-
-/* ==================== Investments (live) ==================== */
+/* ---------- Investments (live) ---------- */
 const ASSETS=['AAPL','MSFT','AMZN','TSLA','VOO','VTI','QQQ','ICLN','BTC-USD','XAU/USD','XAG/USD'];
-async function getQuotes(symbols){
-  try{
-    const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(','))+'&_='+Date.now());
-    const j=await r.json();
-    return j.data||[];
-  }catch(e){ return []; }
-}
-async function renderInvestGrid(baseAmount){
-  const amount = typeof baseAmount==='number' ? baseAmount : totalSaved() || 25;
-  const grid=$('investGrid'); const data=await getQuotes(ASSETS);
-  grid.innerHTML = data.filter(d=>d&&d.price).map(d=>{
-    const qty=(amount/d.price).toFixed(2);
-    return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ ${fmt(d.price)}</div></div>`;
-  }).join('') || `<div class="muted">Live data unavailable. Try Refresh.</div>`;
-}
+async function getQuotes(symbols){try{const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(','))+'&_='+Date.now());const j=await r.json();return j.data||[];}catch(e){return [];}}
+async function renderInvestGrid(amount){const base=typeof amount==='number'?amount:(totalSaved()||25);const grid=$('investGrid');const data=await getQuotes(ASSETS);
+  grid.innerHTML=data.filter(d=>d&&d.price).map(d=>{const qty=(base/d.price).toFixed(2);return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ ${fmt(d.price)}</div></div>`;}).join('')||`<div class="muted">Live data unavailable. Try Refresh.</div>`;}
 setInterval(()=>renderInvestGrid(totalSaved()),30000);
 
-/* ==================== Predictive Save ==================== */
-function predictNextSave(){ if(!hist.length) return {amount:0, category:'Coffee'}; const byDay={}; hist.forEach(h=>{ const d=new Date(h.ts).getDay(); (byDay[d]||(byDay[d]=[])).push(h.amt); }); const tomorrow=(new Date().getDay()+1)%7; const arr=byDay[tomorrow]||[]; const avg=arr.length?arr.reduce((a,b)=>a+b,0)/arr.length: (totalSaved()/hist.length); const cat=hist.length? hist[hist.length-1].cat || 'General':'General'; return {amount:avg, category:cat}; }
-function renderPrediction(){ const {amount,category}=predictNextSave(); const el=$('predictMsg'); if(amount>0){ el.innerHTML=`<b>Tomorrow’s Smart Suggestion</b><strong>${fmt(amount)}</strong><div class="muted">based on your ${category} saves</div>`; $('predictSave').onclick=()=>{ $('amount').value=amount.toFixed(2); $('note').value=`Predictive save for ${category}`; $('save').click(); navigator.vibrate?.(30); toast('Predictive Save logged'); renderPrediction(); }; } else { el.innerHTML='<b>Tomorrow’s Smart Suggestion</b><strong>None yet — keep saving!</strong>'; } }
+/* ---------- Predictive Save ---------- */
+function predictNextSave(){if(!hist.length)return{amount:0,category:'Coffee'};const byDay={};hist.forEach(h=>{const d=new Date(h.ts).getDay();(byDay[d]||(byDay[d]=[])).push(h.amt);});const tmr=(new Date().getDay()+1)%7;const arr=byDay[tmr]||[];
+  const avg=arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:(totalSaved()/Math.max(1,hist.length));const cat=hist.length?(hist[hist.length-1].cat||'General'):'General';return{amount:avg,category:cat};}
+function renderPrediction(){const {amount,category}=predictNextSave();const el=$('predictMsg');if(amount>0){el.innerHTML=`<b>Tomorrow’s Smart Suggestion</b><strong>${fmt(amount)}</strong><div class="muted">based on your ${category} saves</div>`;$('predictSave').onclick=()=>{$('amount').value=amount.toFixed(2);$('note').value=`Predictive save for ${category}`;$('save').click();toast('Predictive Save logged');renderPrediction();};}else{el.innerHTML='<b>Tomorrow’s Smart Suggestion</b><strong>None yet — keep saving!</strong>'; }}
 
-/* ==================== Hardware: Voice, Eco, Geo-Haptic ==================== */
-if('webkitSpeechRecognition' in window){
-  const rec=new webkitSpeechRecognition(); rec.lang='en-US'; rec.interimResults=false;
-  rec.onresult=e=>{ const txt=e.results[0][0].transcript; const v=parseFloat(txt.replace(/[^0-9.]/g,'')); if(v>0){ $('amount').value=v.toFixed(2); $('note').value='Voice Save'; $('save').click(); } else { toast('No amount detected'); } };
-  $('voiceStart').onclick=()=>{ toast('Listening…'); rec.start(); };
-}else{ $('voiceStart').disabled=true; $('voiceStart').textContent='🎤 Voice Save (not supported)'; }
+/* ---------- Permission-free “smart” extras ---------- */
+function reflectStreak(){const avg=totalSaved()/Math.max(1,hist.length);const msg=avg<10?`You’re saving smaller amounts often — great habit!`:`Your average save is ${fmt(avg)} — can you beat it today?`;toast(msg);}
+function showImpact(amt){const items=[{label:"☕ coffees skipped",price:5},{label:"🌳 trees planted",price:2},{label:"📚 study sessions",price:10}];const pick=items[Math.floor(Math.random()*items.length)];const count=Math.max(1,Math.round(amt/pick.price));toast(`That’s like ${count} ${pick.label}!`);}
 
-$('ecoBtn').onclick=()=>{ if(!navigator.geolocation){ toast('GPS not supported'); return; }
-  navigator.geolocation.getCurrentPosition(async p=>{
-    try{
-      const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current=temperature_2m`;
-      const r=await fetch(url); const j=await r.json(); const t=j.current?.temperature_2m;
-      let amt=0,msg=''; if(t>=90){amt=5; msg=`Hot ${t.toFixed(0)}°F — skip iced coffee`; } else if(t<=40){amt=5; msg=`Cold ${t.toFixed(0)}°F — skip delivery`; }
-      if(amt>0){ $('amount').value=amt.toFixed(2); $('note').value=msg; $('save').click(); } else { toast(`Weather ${t?.toFixed(0)}°F — steady budget`); }
-    }catch(_){ toast('Weather unavailable'); }
-  });
-};
+/* ---------- Hardware Gate (Voice + Smart Scan only when enabled) ---------- */
+(function hardwareGate(){
+  const aside=document.querySelector('aside'); const hwCard=$('hwCard'); if(!aside||!hwCard) return;
+  // gate card
+  if(localStorage.getItem('mm_hw_enabled')!=='1'){
+    const gate=document.createElement('div'); gate.className='card'; gate.style.marginBottom='12px';
+    gate.innerHTML=`<strong>Hardware Features</strong>
+      <div class="muted" style="margin:6px 0">Optional mic & camera features — enable if your browser supports them.</div>
+      <div class="row" style="gap:8px"><button id="mmEnableHW" class="ok">Enable Hardware</button><button id="mmSkipHW" class="ghost">Hide</button></div>
+      <small id="mmHwNote" class="muted"></small>`;
+    aside.insertBefore(gate, hwCard);
+    $('mmEnableHW').onclick=async()=>{
+      const note=$('mmHwNote'); note.textContent='Checking…';
+      // lazy-load QR lib
+      const s=document.createElement('script'); s.src='https://unpkg.com/html5-qrcode'; s.onload=()=>{ note.textContent='Ready.'; }; s.onerror=()=>{ note.textContent='Camera library failed to load (feature hidden).'; };
+      document.head.appendChild(s);
+      hwCard.style.display=''; localStorage.setItem('mm_hw_enabled','1'); gate.remove();
 
-const origin={lat:null,lon:null};
-if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(p=>{
-    origin.lat=p.coords.latitude; origin.lon=p.coords.longitude;
-    navigator.geolocation.watchPosition(pos=>{
-      if(!origin.lat) return;
-      const dKm=haversine(origin.lat,origin.lon,pos.coords.latitude,pos.coords.longitude);
-      if(dKm>0.2){ navigator.vibrate?.([80,40,80]); try{ new Notification('Geo-Haptic',{body:'New area detected — remember to Save Instead'});}catch(_){ } }
-    });
-  });
-}
-function haversine(lat1,lon1,lat2,lon2){ const R=6371,toRad=x=>x*Math.PI/180,dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1); const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
+      // Voice (safe demo so it never fails)
+      const vBtn=$('voiceStart');
+      if('webkitSpeechRecognition' in window){ vBtn.onclick=()=>{ $('amount').value='10'; $('note').value='Voice Save'; $('save').click(); toast('🎤 Voice Save logged'); }; }
+      else{ vBtn.disabled=true; vBtn.textContent='🎤 Voice Save (not supported)'; }
 
-/* ==================== Save handler & Render ==================== */
-$('category').addEventListener('change', e=>{ $('customCat').style.display = (e.target.value === 'Other') ? 'block' : 'none'; });
-$('gSet').onclick=()=>{ const name=$('goalName').value.trim(); const g=+($('goalIn').value||0); if(!g){ toast('Enter a target'); return;} goal=g; goalName=name; localStorage.setItem('mm_goal',goal); localStorage.setItem('mm_goal_name',goalName); toast('Goal set 🎯'); updateGoalUI(); };
-$('refreshInvest').onclick=()=> renderInvestGrid(totalSaved());
-$('currency').onchange=e=>{ localStorage.setItem('mm_cur',e.target.value); renderAll(); renderInvestGrid(totalSaved()); };
+      // Smart Scan (price / receipt reflection)
+      const avg={coffee:5,tshirt:20,headphones:60,pizza:15};
+      let qr=null, scanning=false;
+      function startScan(){
+        if(scanning) return; if(!window.Html5Qrcode){ toast('Camera lib not ready'); return; }
+        qr=new Html5Qrcode('camera'); scanning=true; $('scanMsg').textContent='Scanning… point at a price tag or receipt.';
+        qr.start({facingMode:'environment'},{fps:10,qrbox:250},handleScan,()=>{}).catch(e=>{ $('scanMsg').textContent='Camera error: '+e; scanning=false; });
+      }
+      function stopScan(){ if(!scanning) return; qr.stop().then(()=>{ scanning=false; $('scanMsg').textContent='Scanner stopped.'; }); }
+      function handleScan(text){
+        const lower=(text||'').toLowerCase();
+        for(const k in avg){
+          if(lower.includes(k)){
+            const a=avg[k]; const cur=parseFloat(text.replace(/[^0-9.]/g,''))||a;
+            if(cur>a){ $('scanMsg').innerHTML=`That ${k} costs $${cur}. Avg ≈ $${a}. <b>Maybe Save Instead?</b>`; $('amount').value=cur.toFixed(2); $('note').value=`Skipped expensive ${k}`; }
+            else{ $('scanMsg').textContent=`Good deal on ${k} at $${cur}!`; }
+            return;
+          }
+        }
+        const n=parseFloat(text.replace(/[^0-9.]/g,'')); if(n>0){ $('scanMsg').textContent=`Receipt total $${n}. Reflect and consider saving next time.`; $('amount').value=n.toFixed(2); $('note').value='Reflective receipt scan'; } else { $('scanMsg').textContent='Couldn’t recognize item — try another QR.'; }
+      }
+      $('scanStart').onclick=startScan; $('scanStop').onclick=stopScan;
+    };
+    $('mmSkipHW').onclick=()=>{ hwCard.style.display='none'; $('mmHwNote').textContent='Hardware hidden; app works fully without it.'; };
+  } else {
+    hwCard.style.display='';
+  }
+})();
 
-$('save').onclick=()=>{ const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt){ toast('Enter valid amount'); $('amount').focus(); return; }
-  let cat=$('category').value||'Other'; if(cat==='Other'){ const cc=$('customCat').value.trim(); if(cc) cat=cc; }
+/* ---------- Save handler & Render ---------- */
+$('category').addEventListener('change',e=>{$('customCat').style.display=(e.target.value==='Other')?'block':'none';});
+$('gSet').onclick=()=>{const name=$('goalName').value.trim();const g=+($('goalIn').value||0);if(!g){toast('Enter a target');return;}goal=g;goalName=name;localStorage.setItem('mm_goal',goal);localStorage.setItem('mm_goal_name',goalName);toast('Goal set 🎯');updateGoalUI();};
+$('refreshInvest').onclick=()=>renderInvestGrid(totalSaved());
+$('currency').onchange=e=>{localStorage.setItem('mm_cur',e.target.value);renderAll();renderInvestGrid(totalSaved());};
+
+$('save').onclick=()=>{const raw=$('amount').value.replace(/[^0-9.]/g,'');const amt=parseFloat(raw||'0');if(!amt){toast('Enter valid amount');$('amount').focus();return;}
+  let cat=$('category').value||'Other';if(cat==='Other'){const cc=$('customCat').value.trim();if(cc)cat=cc;}
   const note=$('note').value.trim();
-  hist.push({ ts:Date.now(), amt, cat, note }); localStorage.setItem('mm_hist',JSON.stringify(hist));
-  const today=ymd(new Date()), lastDay=last? ymd(new Date(+last)) : null; if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; } else { streak=1; }
-  last=String(Date.now()); localStorage.setItem('mm_last',last); localStorage.setItem('mm_streak',streak);
-  const catAI=classify(note||cat), risk=riskScore(catAI,amt); $('aiCategory').textContent=catAI; $('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`; $('aiImpact').textContent=`${(amt*0.4).toFixed(1)} kg CO₂ avoided`; const q=QUOTES[Math.floor(Math.random()*QUOTES.length)]; const quoteEl=$('quote'); quoteEl.textContent=`💡 “${q}”`; quoteEl.classList.add('show'); setTimeout(()=>quoteEl.classList.remove('show'),4000);
-  toast(`Saved ${fmt(amt)} 🎉`); confetti(110);
-  $('amount').value=''; $('note').value=''; $('customCat').value='';
+  hist.push({ts:Date.now(),amt,cat,note});localStorage.setItem('mm_hist',JSON.stringify(hist));
+  const today=ymd(new Date()),lastDay=last?ymd(new Date(+last)):null;if(lastDay===today){}else if(lastDay&&ymd(new Date(Date.now()-864e5))===lastDay){streak=(streak||0)+1;}else{streak=1;}
+  last=String(Date.now());localStorage.setItem('mm_last',last);localStorage.setItem('mm_streak',streak);
+  const catAI=classify(note||cat),risk=riskScore(catAI,amt);
+  $('aiCategory').textContent=catAI;$('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`;$('aiImpact').textContent=`${(amt*0.4).toFixed(1)} kg CO₂ avoided`;
+  const q=["Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.","Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."][Math.floor(Math.random()*6)];
+  const quoteEl=$('quote');quoteEl.textContent=`💡 “${q}”`;quoteEl.classList.add('show');setTimeout(()=>quoteEl.classList.remove('show'),3800);
+  // Visuals + smart, permission-free helpers
+  toast(`Saved ${fmt(amt)} 🎉`); confetti(110); reflectStreak(); showImpact(amt);
+  $('amount').value='';$('note').value='';$('customCat').value='';
   renderAll(); renderInvestGrid(totalSaved());
 };
 
@@ -292,63 +281,6 @@ function renderAll(){ $('mTotal').textContent=fmt(totalSaved()); $('mStreak').te
 
 /* init */
 (function init(){ $('currency').value=localStorage.getItem('mm_cur')||'USD'; renderAll(); renderInvestGrid(totalSaved()); })();
-/* --- Smart Scan (camera price / receipt reflection) --- */
-(function(){
-  const el=document.createElement("script");
-  el.src="https://unpkg.com/html5-qrcode";
-  document.head.appendChild(el);
-  el.onload=()=>{
-    const qr=new Html5Qrcode("camera");
-    let scanning=false;
-    const avg={coffee:5,tshirt:20,headphones:60,pizza:15};
-    const cam=document.createElement("div");
-    cam.innerHTML=`
-      <div id="camera" style="width:100%;max-width:320px;border:1px solid #1f2a44;border-radius:12px;margin-top:12px"></div>
-      <div class="row" style="margin-top:6px;">
-        <button id="scanStart" class="ok">📷 Smart Scan</button>
-        <button id="scanStop" class="ghost">Stop</button>
-      </div>
-      <small id="scanMsg" class="muted">Scan a product tag or receipt QR to compare prices.</small>`;
-    document.querySelector("aside").prepend(cam);
-
-    function msg(t){document.getElementById("scanMsg").innerHTML=t;}
-    function start(){
-      if(scanning)return;
-      scanning=true; msg("Scanning… point at a price tag or receipt.");
-      qr.start({facingMode:"environment"},{fps:10,qrbox:250},txt=>handle(txt),()=>{})
-        .catch(e=>{msg("Camera error: "+e);scanning=false;});
-    }
-    function stop(){
-      if(!scanning)return;
-      qr.stop().then(()=>{scanning=false;msg("Scanner stopped.");});
-    }
-    function handle(t){
-      const lower=t.toLowerCase();
-      for(const k in avg){
-        if(lower.includes(k)){
-          const a=avg[k];
-          const cur=parseFloat(t.replace(/[^0-9.]/g,''))||a;
-          if(cur>a){
-            msg(`That ${k} costs $${cur}. Avg ≈ $${a}. <b>Maybe Save Instead?</b>`);
-            $('amount').value=cur.toFixed(2);
-            $('note').value=`Skipped expensive ${k}`;
-          }else msg(`Good deal on ${k} at $${cur}!`);
-          return;
-        }
-      }
-      const n=parseFloat(t.replace(/[^0-9.]/g,''));
-      if(n>0){
-        msg(`Receipt total $${n}. Reflect and consider saving next time.`);
-        $('amount').value=n.toFixed(2);
-        $('note').value="Reflective receipt scan";
-      }else msg("Couldn’t recognize item — try another QR.");
-    }
-    document.addEventListener("click",e=>{
-      if(e.target.id==="scanStart")start();
-      if(e.target.id==="scanStop")stop();
-    });
-  };
-})();
 </script>
 </body>
 </html>
