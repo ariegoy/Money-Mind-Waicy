@@ -8,15 +8,15 @@
 <style>
   :root{
     --bg1:#0b1220; --bg2:#0b1220; --panel:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2a44;
-    --primary:#4f8cff; --ok:#22c55e; --accent:#22c55e; --warn:#ef4444;
+    --primary:#4f8cff; --ok:#22c55e; --accent:#22c55e;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
-  header{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
+  header{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,var(--primary),var(--accent));color:#fff;
          padding:14px 18px;box-shadow:0 2px 6px #0006;display:flex;align-items:center;justify-content:space-between;gap:12px}
-  h1{margin:0;font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center;letter-spacing:-.3px}
-  .logo-icon{font-size:28px;background:linear-gradient(135deg,#ef4444,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#ffffff22;color:#fff}
+  h1{margin:0;font-size:20px;font-weight:800;display:flex;gap:10px;align-items:center}
+  .logo{font-size:28px;background:linear-gradient(135deg,#ef4444,#22c55e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .pill{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#ffffff22}
   .pill select{border:0;border-radius:8px;padding:6px 8px;background:#ffffffdd;color:#0b1220}
   main{display:grid;grid-template-columns:1fr 360px;gap:24px;padding:24px;max-width:1200px;margin:auto}
   section,aside{background:var(--panel);border-radius:16px;box-shadow:0 2px 8px #0004;padding:16px;border:1px solid var(--line)}
@@ -24,25 +24,25 @@
   input,select,button{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-family:inherit;background:#0f1a2a;color:var(--ink)}
   button{cursor:pointer}
   .ok{background:var(--ok);color:#fff;border:none}
-  .ghost{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+  .ghost{background:transparent;border:1px dashed var(--line);color:#94a3b8}
   .muted{color:var(--muted)}
   .metric{background:#0b2238;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
   .metric b{display:block;font-size:12px;color:#93c5fd}
   .metric strong{font-size:18px}
   .barwrap{height:10px;background:#122036;border-radius:999px;overflow:hidden}
   .bar{height:100%;background:linear-gradient(90deg,var(--ok),var(--primary));transition:width .5s}
+  .card{border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f172a}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-  .card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#0f172a}
   .asset{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:#0f172a}
   .qty{font-weight:800}
-  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
+  .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0);
+        display:grid;place-items:center;border:2px solid var(--line)}
+  .ring span{font-size:14px;font-weight:700;color:var(--ink)}
+  .toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#e5e7eb;border:1px solid #374151;border-radius:12px;
+         padding:10px 14px;font-size:14px;opacity:0;transition:.25s;z-index:10000}
   .toast.show{opacity:1}
   .quote{margin-top:6px;color:#4f8cff;font-style:italic;opacity:0;transition:opacity .4s}
   .quote.show{opacity:1}
-  .ring{--p:0;width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#122036 0);display:grid;place-items:center;border:2px solid var(--line)}
-  .ring span{font-size:14px;font-weight:700;color:var(--ink)}
-  .chart{border:1px solid var(--line);border-radius:12px;padding:8px;background:#0f172a}
-  .caption{font-size:12px;color:var(--muted);margin-top:4px}
   .confetti{position:fixed;top:-10px;width:8px;height:14px;border-radius:2px;opacity:.9;animation:fall 1.6s linear forwards}
   @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:.85}}
   @media(max-width:900px){main{grid-template-columns:1fr}}
@@ -51,7 +51,7 @@
 <body>
 
 <header>
-  <h1><span class="logo-icon">🧠💵</span> Money Mind — Save Instead</h1>
+  <h1><span class="logo">🧠💵</span> Money Mind — Save Instead</h1>
   <div class="pill">
     <span>Currency</span>
     <select id="currency">
@@ -111,11 +111,11 @@
 
     <div class="card" style="margin-top:16px">
       <div class="row" style="justify-content:space-between;align-items:center">
-        <h3 style="margin:0">With this amount you could buy…</h3>
+        <h3 style="margin:0">With your savings you could buy…</h3>
         <button id="refreshInvest" class="ghost">Refresh</button>
       </div>
       <div id="investGrid" class="grid" style="margin-top:8px"></div>
-      <small class="muted">Live prices via /api/quotes.</small>
+      <small class="muted">Live prices via /api/quotes (Finnhub).</small>
     </div>
 
     <h3 style="margin-top:18px">History</h3>
@@ -124,13 +124,16 @@
 
   <!-- RIGHT: impact, badges, charts + hardware & predictive -->
   <aside>
-    <h3>Your Impact & Achievements</h3>
+    <h3>Your Impact & Hardware</h3>
     <div class="metric"><b>CO₂ Avoided</b><strong id="ecoText">0 kg</strong></div>
     <div class="barwrap"><div id="ecoBar" class="bar" style="width:0%"></div></div>
 
-    <div style="margin-top:12px">
-      <h3 style="margin:0 0 8px 0">Badges</h3>
-      <div id="badges" class="grid"></div>
+    <div class="card" style="margin-top:12px">
+      <div class="row" style="gap:8px">
+        <button id="voiceStart" class="ok">🎤 Voice Save</button>
+        <button id="ecoBtn" class="ok">🌍 Eco-Aware Save</button>
+      </div>
+      <small class="muted">Geo-Haptic reminder runs automatically (buzz when you move away from your save spot).</small>
     </div>
 
     <h3 style="margin-top:16px">Predictive Save</h3>
@@ -141,43 +144,25 @@
     <button id="predictSave" class="ok" style="margin-top:8px;">Save Ahead</button>
 
     <h3 style="margin-top:16px">Insights</h3>
-    <div class="chart">
+    <div class="card">
       <svg id="barChart" width="100%" height="170"></svg>
       <div class="caption">$ Saved by Category (this month)</div>
     </div>
-    <div class="chart" style="margin-top:8px">
+    <div class="card" style="margin-top:8px">
       <svg id="pieChart" width="100%" height="170"></svg>
       <div class="caption">Category Distribution</div>
-    </div>
-
-    <h3 style="margin-top:16px">Hardware</h3>
-    <div class="card">
-      <div id="camera" style="width:100%;max-width:320px;border-radius:12px;border:1px solid var(--line)"></div>
-      <div class="row" style="margin-top:8px;">
-        <button id="scanStart" class="ok">📷 Scan QR</button>
-        <button id="scanStop" class="ghost">Stop</button>
-      </div>
-      <small id="scanMsg" class="muted">Scan a QR containing a number (e.g., 12.50)</small>
-      <div class="row" style="margin-top:8px;">
-        <button id="voiceStart" class="ok">🎤 Voice Save</button>
-        <button id="ecoBtn" class="ok">🌍 Eco-Aware Save</button>
-      </div>
-      <small class="muted">Geo-Haptic runs automatically (vibration reminder).</small>
     </div>
   </aside>
 </main>
 
 <div id="toast" class="toast"></div>
 
-<!-- QR library -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
-/* ==================== Core helpers & state ==================== */
+/* ==================== Helpers & State ==================== */
 const $ = id => document.getElementById(id);
 const C = { USD:'$', EUR:'€', GBP:'£', INR:'₹' };
 function fmt(n){ const cur = localStorage.getItem('mm_cur') || 'USD'; return C[cur] + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function ymd(d){ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()) }
-
 let hist = JSON.parse(localStorage.getItem('mm_hist')||'[]'); // {ts, amt, cat?, note?}
 let goal = +localStorage.getItem('mm_goal') || 0;
 let goalName = localStorage.getItem('mm_goal_name') || '';
@@ -187,19 +172,16 @@ const QUOTES = [
   "Small wins add up fast.","You just paid your future self.","Skip a treat, grow a streak.",
   "Save today, thank yourself tomorrow.","Consistency beats intensity.","Purpose beats impulse."
 ];
-
-function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
-function weekSavesCount(){ const t=Date.now()-7*864e5; return hist.filter(h=>h.ts>=t).length; }
-function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
+if(Notification && Notification.permission==='default'){ Notification.requestPermission(); }
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 function confetti(n=100){ const colors=['#22c55e','#4f8cff','#f59e0b','#ef4444','#a855f7']; for(let i=0;i<n;i++){const el=document.createElement('div'); el.className='confetti'; el.style.left=Math.random()*100+'vw'; el.style.background=colors[i%colors.length]; el.style.transform='rotate('+(Math.random()*360)+'deg)'; el.style.animationDelay=(Math.random()*0.3)+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),1800);} }
-if(Notification && Notification.permission==='default'){ Notification.requestPermission(); }
 
 /* ==================== AI helpers ==================== */
 function classify(text){ const map={coffee:'Coffee',latte:'Coffee',snack:'Snacks',chips:'Snacks',shirt:'Clothes',hoodie:'Clothes',gadget:'Gadgets',charger:'Gadgets',uber:'Rides',ride:'Rides'}; text=(text||'').toLowerCase(); for(const k in map){ if(text.includes(k)) return map[k]; } return 'Other'; }
 function riskScore(cat,amt){ const hour=new Date().getHours(); const base={Coffee:1,Snacks:2,Clothes:3,Gadgets:4,Rides:3,Other:1}[cat]||1; const late=(hour>=22||hour<=5)?2:0; const price=Math.min(amt/20,4); return Math.max(1,Math.min(10,Math.round(base+late+price))); }
 
 /* ==================== Goal / streak / impact ==================== */
+function totalSaved(){ return hist.reduce((s,h)=>s + Number(h.amt||0), 0); }
 function updateGoalUI(){ const s=totalSaved(); const pct=goal?Math.min(100,Math.round(s/goal*100)):0; $('goalPct').textContent=pct+'%'; $('goalBar').style.width=pct+'%'; $('goalRing').style.setProperty('--p', pct); $('goalText').textContent=goal?`${goalName?goalName+' • ':''}${fmt(goal)} target`:'No goal set'; }
 function updateImpact(){ const eco = totalSaved()*0.4; $('ecoText').textContent = eco.toFixed(1) + ' kg'; $('ecoBar').style.width = Math.min(100,(eco/400)*100) + '%'; }
 
@@ -207,18 +189,17 @@ function updateImpact(){ const eco = totalSaved()*0.4; $('ecoText').textContent 
 let badges = JSON.parse(localStorage.getItem('mm_badges')||'[]');
 function haveBadge(id){ return badges.some(b=>b.id===id); }
 function giveBadge(id,label,icon){ if(haveBadge(id)) return; badges.push({id,label,icon}); localStorage.setItem('mm_badges',JSON.stringify(badges)); }
-function updateBadges(){ const s=totalSaved(), w=weekSavesCount(), t=hist.length;
+function updateBadges(){ const s=totalSaved(), t=hist.length;
   if(t>=1) giveBadge('first','First Save','🎉');
   if(s>=100) giveBadge('100','$100 Saved','🥇');
   if(s>=500) giveBadge('500','$500 Saved','🏆');
   if(s>=1000) giveBadge('1000','$1000 Saved','💎');
-  if(streak>=5) giveBadge('streak5','5-Day Streak','🔥');
-  if(w>=5) giveBadge('week5','5 Saves This Week','📅');
   const wrap=$('badges'); wrap.innerHTML=''; (badges.length?badges:[{label:'Make a save to unlock badges',icon:'💤'}]).forEach(b=>{ const div=document.createElement('div'); div.className='asset'; div.innerHTML=`<div><i>${b.icon}</i> ${b.label}</div>`; wrap.appendChild(div); });
 }
 function renderHistory(){ const ul=$('history'); ul.innerHTML=''; hist.slice().reverse().slice(0,30).forEach(h=>{ const li=document.createElement('li'); li.innerHTML=`<div class="row" style="justify-content:space-between;width:100%"><span>${new Date(h.ts).toLocaleString()}</span><span><strong>${fmt(h.amt)}</strong> <small class="muted">${h.cat||''}</small></span></div>${h.note?`<div class="muted">${h.note}</div>`:''}`; ul.appendChild(li); }); }
 
 /* ==================== Charts ==================== */
+function thisMonth(ts){ const d=new Date(ts),n=new Date(); return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth(); }
 function drawBarChart(){ const svg=$('barChart'); while(svg.firstChild) svg.removeChild(svg.firstChild);
   const by={}; hist.filter(h=>thisMonth(h.ts)).forEach(h=>{ const c=h.cat||'Other'; by[c]=(by[c]||0)+h.amt; });
   const cats=Object.keys(by), vals=Object.values(by); if(!cats.length){ svg.innerHTML='<text x="10" y="100" fill="#94a3b8">No data yet</text>'; return;}
@@ -237,43 +218,63 @@ function drawPieChart(){ const svg=$('pieChart'); while(svg.firstChild) svg.remo
 
 /* ==================== Investments (live) ==================== */
 const ASSETS=['AAPL','MSFT','AMZN','TSLA','VOO','VTI','QQQ','ICLN','BTC-USD','XAU/USD','XAG/USD'];
-async function getQuotes(symbols){ try{ const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(','))); const j=await r.json(); return j.data||[]; }catch(e){ return []; } }
-let currentAmount=25;
-async function renderInvestGrid(amount){ currentAmount=amount||currentAmount||25; const grid=$('investGrid'); const data=await getQuotes(ASSETS);
-  grid.innerHTML = data.filter(d=>d&&d.price).map(d=>{ const qty=(currentAmount/d.price).toFixed(2); return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ ${fmt(d.price)}</div></div>`; }).join('') || `<div class="muted">Live data unavailable. Try Refresh.</div>`;
+async function getQuotes(symbols){
+  try{
+    const r=await fetch('/api/quotes?symbols='+encodeURIComponent(symbols.join(','))+'&_='+Date.now());
+    const j=await r.json();
+    return j.data||[];
+  }catch(e){ return []; }
 }
-setInterval(()=>renderInvestGrid(),30000);
+async function renderInvestGrid(baseAmount){
+  const amount = typeof baseAmount==='number' ? baseAmount : totalSaved() || 25;
+  const grid=$('investGrid'); const data=await getQuotes(ASSETS);
+  grid.innerHTML = data.filter(d=>d&&d.price).map(d=>{
+    const qty=(amount/d.price).toFixed(2);
+    return `<div class="asset"><div><strong>${d.symbol}</strong><div class="muted" style="font-size:12px">live</div></div><div class="qty">${qty} @ ${fmt(d.price)}</div></div>`;
+  }).join('') || `<div class="muted">Live data unavailable. Try Refresh.</div>`;
+}
+setInterval(()=>renderInvestGrid(totalSaved()),30000);
 
 /* ==================== Predictive Save ==================== */
 function predictNextSave(){ if(!hist.length) return {amount:0, category:'Coffee'}; const byDay={}; hist.forEach(h=>{ const d=new Date(h.ts).getDay(); (byDay[d]||(byDay[d]=[])).push(h.amt); }); const tomorrow=(new Date().getDay()+1)%7; const arr=byDay[tomorrow]||[]; const avg=arr.length?arr.reduce((a,b)=>a+b,0)/arr.length: (totalSaved()/hist.length); const cat=hist.length? hist[hist.length-1].cat || 'General':'General'; return {amount:avg, category:cat}; }
 function renderPrediction(){ const {amount,category}=predictNextSave(); const el=$('predictMsg'); if(amount>0){ el.innerHTML=`<b>Tomorrow’s Smart Suggestion</b><strong>${fmt(amount)}</strong><div class="muted">based on your ${category} saves</div>`; $('predictSave').onclick=()=>{ $('amount').value=amount.toFixed(2); $('note').value=`Predictive save for ${category}`; $('save').click(); navigator.vibrate?.(30); toast('Predictive Save logged'); renderPrediction(); }; } else { el.innerHTML='<b>Tomorrow’s Smart Suggestion</b><strong>None yet — keep saving!</strong>'; } }
 
-/* ==================== Hardware: helpers ==================== */
-function haptic(ms=40){ if(navigator.vibrate) try{ navigator.vibrate(ms); }catch(_){ } }
-function notify(title,body){ try{ if(!("Notification" in window)) return; if(Notification.permission==="granted") new Notification(title,{body}); }catch(_){ } }
+/* ==================== Hardware: Voice, Eco, Geo-Haptic ==================== */
+if('webkitSpeechRecognition' in window){
+  const rec=new webkitSpeechRecognition(); rec.lang='en-US'; rec.interimResults=false;
+  rec.onresult=e=>{ const txt=e.results[0][0].transcript; const v=parseFloat(txt.replace(/[^0-9.]/g,'')); if(v>0){ $('amount').value=v.toFixed(2); $('note').value='Voice Save'; $('save').click(); } else { toast('No amount detected'); } };
+  $('voiceStart').onclick=()=>{ toast('Listening…'); rec.start(); };
+}else{ $('voiceStart').disabled=true; $('voiceStart').textContent='🎤 Voice Save (not supported)'; }
 
-/* Camera / QR (html5-qrcode) */
-const qrReader=new Html5Qrcode("camera"); let scanning=false;
-function startScanner(){ if(scanning) return; scanning=true; $('scanMsg').textContent="Scanner active. Point at a QR containing a number."; qrReader.start({facingMode:"environment"},{fps:10,qrbox:250}, txt=>{ const n=parseFloat((txt||'').replace(/[^0-9.]/g,'')); if(n>0){ $('amount').value=n.toFixed(2); $('note').value='QR Scan Save'; $('save').click(); haptic(40); notify('QR Save',`Logged ${fmt(n)}`); stopScanner(); } }, ()=>{}).catch(e=>{$('scanMsg').textContent="Camera error: "+e; scanning=false;}); }
-function stopScanner(){ if(!scanning) return; qrReader.stop().then(()=>{ scanning=false; $('scanMsg').textContent="Scanner stopped."; }); }
-$('scanStart').onclick=startScanner; $('scanStop').onclick=stopScanner;
+$('ecoBtn').onclick=()=>{ if(!navigator.geolocation){ toast('GPS not supported'); return; }
+  navigator.geolocation.getCurrentPosition(async p=>{
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current=temperature_2m`;
+      const r=await fetch(url); const j=await r.json(); const t=j.current?.temperature_2m;
+      let amt=0,msg=''; if(t>=90){amt=5; msg=`Hot ${t.toFixed(0)}°F — skip iced coffee`; } else if(t<=40){amt=5; msg=`Cold ${t.toFixed(0)}°F — skip delivery`; }
+      if(amt>0){ $('amount').value=amt.toFixed(2); $('note').value=msg; $('save').click(); } else { toast(`Weather ${t?.toFixed(0)}°F — steady budget`); }
+    }catch(_){ toast('Weather unavailable'); }
+  });
+};
 
-/* Voice Save (Chrome speech) */
-if('webkitSpeechRecognition' in window){ const rec=new webkitSpeechRecognition(); rec.lang='en-US'; rec.interimResults=false; rec.onresult=e=>{ const txt=e.results[0][0].transcript; const v=parseFloat(txt.replace(/[^0-9.]/g,'')); if(v>0){ $('amount').value=v.toFixed(2); $('note').value='Voice Save'; $('save').click(); haptic(40); notify('Voice Save',`Saved ${fmt(v)}`); } }; document.getElementById('voiceStart').onclick=()=>{ toast('Listening…'); rec.start(); }; } else { document.getElementById('voiceStart').disabled=true; }
-
-/* Eco-Aware Save (GPS + weather) */
-document.getElementById('ecoBtn').onclick=()=>{ if(!navigator.geolocation){ toast('GPS not supported'); return; } navigator.geolocation.getCurrentPosition(async p=>{ const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current=temperature_2m`; try{ const r=await fetch(url); const j=await r.json(); const t=j.current?.temperature_2m; let amt=0,msg=''; if(t>=90){ amt=5; msg=`Hot ${t.toFixed(0)}°F — skip iced coffee`; } else if(t<=40){ amt=5; msg=`Cold ${t.toFixed(0)}°F — skip delivery`; } if(amt>0){ $('amount').value=amt.toFixed(2); $('note').value=msg; $('save').click(); haptic(40); notify('Eco Save', msg); } else { toast(`Weather ${t?.toFixed(0)}°F — steady budget`);} }catch(_){ toast('Weather unavailable'); } }); };
-
-/* Geo-Haptic Reminder (GPS + vibration) */
 const origin={lat:null,lon:null};
-if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>{ origin.lat=p.coords.latitude; origin.lon=p.coords.longitude; navigator.geolocation.watchPosition(pos=>{ if(!origin.lat) return; const dKm = haversine(origin.lat,origin.lon,pos.coords.latitude,pos.coords.longitude); if(dKm>0.2){ haptic(80); notify('Geo-Haptic','New area detected — remember to Save Instead'); } }); }); }
-function haversine(lat1,lon1,lat2,lon2){ const R=6371, toRad=x=>x*Math.PI/180; const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1); const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(p=>{
+    origin.lat=p.coords.latitude; origin.lon=p.coords.longitude;
+    navigator.geolocation.watchPosition(pos=>{
+      if(!origin.lat) return;
+      const dKm=haversine(origin.lat,origin.lon,pos.coords.latitude,pos.coords.longitude);
+      if(dKm>0.2){ navigator.vibrate?.([80,40,80]); try{ new Notification('Geo-Haptic',{body:'New area detected — remember to Save Instead'});}catch(_){ } }
+    });
+  });
+}
+function haversine(lat1,lon1,lat2,lon2){ const R=6371,toRad=x=>x*Math.PI/180,dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1); const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
-/* ==================== Save handler & render ==================== */
+/* ==================== Save handler & Render ==================== */
 $('category').addEventListener('change', e=>{ $('customCat').style.display = (e.target.value === 'Other') ? 'block' : 'none'; });
 $('gSet').onclick=()=>{ const name=$('goalName').value.trim(); const g=+($('goalIn').value||0); if(!g){ toast('Enter a target'); return;} goal=g; goalName=name; localStorage.setItem('mm_goal',goal); localStorage.setItem('mm_goal_name',goalName); toast('Goal set 🎯'); updateGoalUI(); };
-$('refreshInvest').onclick=()=>{ const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0')||25; renderInvestGrid(amt); };
-$('currency').onchange=e=>{ localStorage.setItem('mm_cur',e.target.value); renderAll(); renderInvestGrid(25); };
+$('refreshInvest').onclick=()=> renderInvestGrid(totalSaved());
+$('currency').onchange=e=>{ localStorage.setItem('mm_cur',e.target.value); renderAll(); renderInvestGrid(totalSaved()); };
 
 $('save').onclick=()=>{ const raw=$('amount').value.replace(/[^0-9.]/g,''); const amt=parseFloat(raw||'0'); if(!amt){ toast('Enter valid amount'); $('amount').focus(); return; }
   let cat=$('category').value||'Other'; if(cat==='Other'){ const cc=$('customCat').value.trim(); if(cc) cat=cc; }
@@ -282,13 +283,15 @@ $('save').onclick=()=>{ const raw=$('amount').value.replace(/[^0-9.]/g,''); cons
   const today=ymd(new Date()), lastDay=last? ymd(new Date(+last)) : null; if(lastDay===today){} else if(lastDay && ymd(new Date(Date.now()-864e5))===lastDay){ streak=(streak||0)+1; } else { streak=1; }
   last=String(Date.now()); localStorage.setItem('mm_last',last); localStorage.setItem('mm_streak',streak);
   const catAI=classify(note||cat), risk=riskScore(catAI,amt); $('aiCategory').textContent=catAI; $('aiRisk').textContent=`${risk>=8?'High':risk>=6?'Medium':'Low'} (${risk}/10)`; $('aiImpact').textContent=`${(amt*0.4).toFixed(1)} kg CO₂ avoided`; const q=QUOTES[Math.floor(Math.random()*QUOTES.length)]; const quoteEl=$('quote'); quoteEl.textContent=`💡 “${q}”`; quoteEl.classList.add('show'); setTimeout(()=>quoteEl.classList.remove('show'),4000);
-  toast(`Saved ${fmt(amt)} 🎉`); confetti(110); $('amount').value=''; $('note').value=''; $('customCat').value=''; renderAll(); renderInvestGrid(amt);
+  toast(`Saved ${fmt(amt)} 🎉`); confetti(110);
+  $('amount').value=''; $('note').value=''; $('customCat').value='';
+  renderAll(); renderInvestGrid(totalSaved());
 };
 
 function renderAll(){ $('mTotal').textContent=fmt(totalSaved()); $('mStreak').textContent=streak+' days'; updateGoalUI(); updateImpact(); renderHistory(); updateBadges(); drawBarChart(); drawPieChart(); renderPrediction(); }
 
 /* init */
-(function init(){ const cur=localStorage.getItem('mm_cur')||'USD'; $('currency').value=cur; renderAll(); renderInvestGrid(25); })();
+(function init(){ $('currency').value=localStorage.getItem('mm_cur')||'USD'; renderAll(); renderInvestGrid(totalSaved()); })();
 </script>
 </body>
 </html>
